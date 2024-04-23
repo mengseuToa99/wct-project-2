@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('description');
-            $table->string('image');
+            $table->string('image')->nullable();
             $table->string('anonymous');
-            $table->string('feedback');
+            $table->string('feedback')->nullable();
             $table->timestamps();
         });
     }
