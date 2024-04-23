@@ -17,7 +17,9 @@ class LocationFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'building' => $this->faker->randomElement(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']),
+            'floor' => $this->faker->numberBetween(1, 4),
+            'room' => $this->faker->numberBetween(100, 400),
         ];
     }
 }
