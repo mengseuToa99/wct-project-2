@@ -17,7 +17,9 @@ class ReporterFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'username' => $this->faker->username(),
+            'profile_pic' => $this->faker
+
         ];
     }
 }

@@ -18,7 +18,8 @@ return new class extends Migration
             $table->unsignedBigInteger('location_id');
             $table->unsignedBigInteger('report_detail_id');
             $table->unsignedBigInteger('category_id');
-            $table->integer('created_date');
+
+            // relation to other table
             $table->foreign('reporter_id')->references('id')->on('reporters');
             $table->foreign('location_id')->references('id')->on('locations');
             $table->foreign('report_detail_id')->references('id')->on('report_details');
