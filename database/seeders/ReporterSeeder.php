@@ -13,10 +13,10 @@ class ReporterSeeder extends Seeder
      */
     public function run(): void
     {
-        reporter::factory()
-        ->count(5)
-        ->hasReports(5)
-        ->create();
+        Reporter::factory()
+            ->count(5)
+            ->hasReports(1) // each reporter has 1 report
+            ->create();
         
     }
 }

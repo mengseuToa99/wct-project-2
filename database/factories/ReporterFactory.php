@@ -22,7 +22,7 @@ class ReporterFactory extends Factory
             'profile_pic' => $this->faker->imageUrl(640, 480, 'people'),
             'email' => $this->faker->unique()->safeEmail(),
             'password' => Hash::make('password'),
-
+            'role' => $this->faker->randomElement(['admin', 'user']), // add this line
         ];
     }
 }
