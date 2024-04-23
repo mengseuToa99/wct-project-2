@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class report extends Model
+class Report extends Model
 {
     use HasFactory;
 
@@ -17,32 +17,25 @@ class report extends Model
         'location_id',
         'report_detail_id', 
         'category_id',
-        'building',
-        'floor',
-        'room', 
-        'anonymous',
-        'image',
-        'like',
-        'category'
     ];
 
     public function reporter()
     {
-        return $this->belongsTo(reporter::class);
+        return $this->belongsTo(Reporter::class);
     }
 
     public function location()
     {
-        return $this->belongsTo(location::class);
+        return $this->belongsTo(Location::class);
     }
 
     public function reportDetail()
     {
-        return $this->belongsTo(report_detail::class);
+        return $this->belongsTo(ReportDetail::class);
     }
 
     public function category()
     {
-        return $this->belongsTo(category::class);
+        return $this->belongsTo(Category::class);
     }
 }
