@@ -15,11 +15,9 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ResetPassword;
 use Illuminate\Support\Facades\Hash;
-
 use App\Http\Requests\UpdateReportRequest;
 use App\Http\Resources\v1\ReporterCollection;
-use App\Service\ReportQuery;
-use Illuminate\Support\Facades\Schema;
+
 
 
 class ReporterController extends Controller
