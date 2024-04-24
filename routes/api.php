@@ -1,10 +1,9 @@
 <?php
 
-
-use App\Http\Controllers\ReporterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\v1\ReportController;
+use App\Http\Controllers\api\v1\ReporterController;
 
 /*
 |--------------------------------------------------------------------------
