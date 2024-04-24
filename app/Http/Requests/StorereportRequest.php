@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StorereportRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class StorereportRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +23,20 @@ class StorereportRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'reporter_id' => ['required', 'integer'],
+            // 'location_id' => ['required', 'integer'],
+            // 'report_detail_id' => ['required', 'integer'],
+            // 'category_id' => ['required', 'integer'],
+            'status' => ['required', Rule::in(['nostatus', 'pending', 'deny', 'complete'])],
+            'title' => ['required'],
+            'building' => ['required'],
+            'floor' => ['required', 'integer'],
+            'description' => ['required'],
+            'anonymous' => ['required', 'boolean'],
+            'feedback' => ['string'],
+            'image' => ['nullable', 'mimes:jpg,jpeg,png'],
+            'room' => ['required', 'integer'],
+            'category' => ['required', 'string']
         ];
     }
 }
