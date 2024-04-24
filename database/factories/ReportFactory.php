@@ -2,11 +2,10 @@
 
 namespace Database\Factories;
 
-use App\Models\category;
-use App\Models\location;
-use App\Models\report_detail;
+use App\Models\Category;
+use App\Models\Location;
 use App\Models\ReportDetail;
-use App\Models\reporter;
+use App\Models\Reporter;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

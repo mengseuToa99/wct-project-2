@@ -20,6 +20,7 @@ class ReportDetailFactory extends Factory
             'title' => $this->faker->sentence(3),
             'description' => $this->faker->paragraph(3),
             'anonymous' => $this->faker->boolean, // generates a random boolean (true or false)
+            'image' => $this->faker->imageUrl(640, 480, 'place'),
             'feedback' => $this->faker->sentence(2),
         ];
     }
