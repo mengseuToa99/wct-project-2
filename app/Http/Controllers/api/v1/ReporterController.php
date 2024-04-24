@@ -16,7 +16,7 @@ use App\Http\Requests\UpdateReportRequest;
 use App\Http\Resources\v1\ReporterCollection;
 use App\Service\ReportQuery;
 use Illuminate\Support\Facades\Schema;
-
+use Illuminate\Support\Facades\Validator;
 
 class ReporterController extends Controller
 {
@@ -103,7 +103,7 @@ class ReporterController extends Controller
     {
         try {
             // Validate the request
-            $validateUser = validator::make($request->all(), [
+            $validateUser = Validator::make($request->all(), [
                 'email' => 'required|email',
                 'password' => 'required'
             ]);
