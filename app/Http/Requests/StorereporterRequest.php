@@ -19,7 +19,8 @@ class StorereporterRequest extends FormRequest
         return [
             'username' => ['nullable'],
             'email' => ['required', 'email'],
-            'password' => ['nullable']
+            'password' => ['nullable'],
+            'role' => ['nullable'],
         ];
     }
 }
