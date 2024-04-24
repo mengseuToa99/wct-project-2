@@ -27,38 +27,38 @@ class ReporterController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
-        $filter = new ReportQuery();
-        $filterItems = $filter->transform($request);
+{
+    $filter = new ReportQuery();
+    $filterItems = $filter->transform($request);
 
-        $includeReport = $request->query('includeReport');
+    $includeReport = $request->query('includeReport');
 
-        $reportersQuery = Reporter::query();
+    $reportersQuery = Reporter::query();
 
-        // Apply filters
-        foreach ($filterItems as $column => $value) {
-            // Check if the column exists in the reporters table
-            if (Schema::hasColumn('reporters', $column)) {
-                $reportersQuery->where($column, $value);
-            } else {
-            
-            }
-        }
-
-        // Include reports if needed
-        if ($includeReport) {
-            $reportersQuery->with('reports');
+    // Apply filters
+    foreach ($filterItems as $column => $value) {
+        // Check if the column exists in the reporters table
+        if (Schema::hasColumn('reporters', $column)) {
+            $reportersQuery->where($column, $value);
         } else {
-            // Eager load reports for all reporters
-            $reportersQuery->with('reports');
+            // Handle the case when the column doesn't exist
         }
-
-        // Paginate the results and append the query parameters
-        $perPage = $request->query('per_page', 10); // Default to 10 items per page
-        $reporters = $reportersQuery->paginate($perPage)->appends($request->query());
-
-        return new ReporterController($reporters);
     }
+
+    // Include reports if needed
+    if ($includeReport) {
+        $reportersQuery->with('reports');
+    } else {
+        // Eager load reports for all reporters
+        $reportersQuery->with('reports');
+    }
+
+    // Paginate the results and append the query parameters
+    $perPage = $request->query('per_page', 10); // Default to 10 items per page
+    $reporters = $reportersQuery->paginate($perPage)->appends($request->query());
+
+    return new ReporterCollection($reporters); // Return a collection of reporters
+}
 
     /**
      * Show the form for creating a new resource.
@@ -91,13 +91,6 @@ class ReporterController extends Controller
         return response()->json(['message' => 'User created successfully'], 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(reporter $reporter)
-    {
-        //
-    }
 
     /**
      * Show the form for editing the specified resource.
