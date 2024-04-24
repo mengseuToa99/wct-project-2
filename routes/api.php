@@ -24,7 +24,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\api\v1'], f
 
     Route::apiResource('reporter', ReporterController::class);
     Route::get('/stats', [ReporterController::class, 'reportStats']);
-    Route::post('v1/reporter/addStu', [ReporterController::class, 'store']);
+    Route::post('/reporter/addStu', [ReporterController::class, 'store']);
     Route::get('/reporters/stats', [ReporterController::class, 'allReportersWithStats']);
     Route::delete('/reporter/{reporter}', [ReporterController::class, 'destroy']);
 
