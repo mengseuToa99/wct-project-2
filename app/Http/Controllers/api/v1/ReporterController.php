@@ -2,21 +2,25 @@
 
 namespace App\Http\Controllers\api\v1;
 
+
+use App\Models\Reporter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorereportRequest;
-use App\Mail\ResetPassword;
-use App\Models\Reporter;
+use App\Service\ReportQuery;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Auth;
+use App\Mail\ResetPassword;
 use Illuminate\Support\Facades\Hash;
 
 use App\Http\Requests\UpdateReportRequest;
 use App\Http\Resources\v1\ReporterCollection;
 use App\Service\ReportQuery;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Validator;
+
 
 class ReporterController extends Controller
 {
@@ -54,7 +58,7 @@ class ReporterController extends Controller
         $perPage = $request->query('per_page', 10); // Default to 10 items per page
         $reporters = $reportersQuery->paginate($perPage)->appends($request->query());
 
-        return new ReporterCollection($reporters);
+        return new ReporterController($reporters);
     }
 
     /**
