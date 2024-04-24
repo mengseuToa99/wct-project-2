@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('reporters', function (Blueprint $table) {
             $table->id();
-            $table->string('username');
+            $table->string('username')->default('')->nullable();
             $table->string('profile_pic')->nullable();
             $table->string('email')->unique();
             $table->string('role');
