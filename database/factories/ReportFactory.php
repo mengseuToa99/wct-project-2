@@ -22,11 +22,11 @@ class ReportFactory extends Factory
     public function definition(): array
     {
         return [
-            'reporter_id' => Reporter::factory(),
+            'reporter_id' => Reporter::factory()->create()->id,
             'status' => $this->faker->randomElement(['nostatus', 'pending', 'deny', 'complete']),
-            'location_id' => Location::factory(),
-            'report_detail_id' => ReportDetail::factory(),
-            'category_id' => Category::factory(),
+            'location_id' => Location::factory()->create()->id,
+            'report_detail_id' => ReportDetail::factory()->create()->id,
+            'category_id' => Category::factory()->create()->id,
         ];
     }
 }
