@@ -4,6 +4,7 @@ namespace App\Http\Resources\v1;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Carbon;
 
 class ReportResource extends JsonResource
 {
@@ -18,6 +19,7 @@ class ReportResource extends JsonResource
 
         'id' => $this->id,
         'Reporter_Name' => $this->Reporter->username,
+        'Reporter_Pic' => $this->Reporter->profile_pic,
         'status' => $this->status,
         'category_name' => $this->category->name,
         'title' => $this->ReportDetail->title,
@@ -27,7 +29,7 @@ class ReportResource extends JsonResource
         'building' => $this->Location->building,
         'floor' => $this->Location->floor,
         'room' => $this->Location->room,
-        'timeline' => $this-> created_at,
+        'timeline' => Carbon::parse($this->created_at)->format('d M Y'),
     ];
     }
 }
