@@ -40,7 +40,7 @@ class ReportController extends Controller
         if ($user_id) {
             $query->where('reporter_id', $user_id);
         }
-        $reports = $query->paginate();
+        $reports = $query->paginate(10);
 
         return new ReportCollection($reports);
     }
