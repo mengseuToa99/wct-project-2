@@ -18,8 +18,8 @@ use App\Mail\ResetPassword;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\UpdateReportRequest;
 use App\Http\Resources\v1\ReporterCollection;
-
-
+use App\Models\Report;
+use Illuminate\Auth\Access\Gate;
 
 class ReporterController extends Controller
 {
@@ -59,6 +59,25 @@ class ReporterController extends Controller
 
     return new ReporterCollection($reporters); // Return a collection of reporters
 }
+
+public function allReportersWithStats()
+{
+    // if (Gate::denies('admin-ability')) {
+    //     throw new AuthorizationException('You are not authorized to perform this action.');
+    // }
+
+    $reporters = Reporter::withCount([
+        'reports as total_reports',
+        'reports as denied_reports' => function ($query) {
+            $query->where('status', 'deny');
+        },
+        'reports as accepted_reports' => function ($query) {
+            $query->where('status', 'complete');
+        }
+    ])->get();
+
+    return response()->json($reporters);
+}
     /**
      * Store a newly created resource in storage.
      */
@@ -80,6 +99,33 @@ class ReporterController extends Controller
         Mail::to($reporter->email)->send(new ResetPassword ($reporter, $password));
     
         return response()->json(['message' => 'User created successfully'], 201);
+    }
+
+
+    public function reportStats()
+    {
+        // if (Gate::denies('admin-ability')) {
+        //     throw new AuthorizationException('You are not authorized to perform this action.');
+        // }
+        
+        // Count total reporters
+        $totalUsers = Reporter::count();
+
+        // Count total reports created by all reporters
+        $totalReports = Report::count();
+
+        // Count reports that are denied
+        $deniedReports = Report::where('status', 'deny')->count();
+
+        // Count reports that are accepted
+        $acceptedReports = Report::where('status', 'pending')->count();
+
+        return response()->json([
+            'total_users' => $totalUsers,
+            'total_reports' => $totalReports,
+            'denied_reports' => $deniedReports,
+            'accepted_reports' => $acceptedReports,
+        ]);
     }
 
 
