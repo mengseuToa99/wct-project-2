@@ -59,15 +59,6 @@ class ReporterController extends Controller
 
     return new ReporterCollection($reporters); // Return a collection of reporters
 }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
     /**
      * Store a newly created resource in storage.
      */
