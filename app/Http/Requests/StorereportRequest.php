@@ -34,7 +34,7 @@ class StorereportRequest extends FormRequest
             'description' => ['required'],
             'anonymous' => ['required', 'boolean'],
             'feedback' => ['string'],
-            'image' => ['nullable', 'mimes:jpg,jpeg,png'],
+            'image' => ['nullable', 'file', 'mimes:png,jpg,jpeg'],
             'room' => ['required', 'integer'],
             'category' => ['required', 'string']
         ];

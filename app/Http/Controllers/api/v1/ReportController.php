@@ -14,9 +14,12 @@ use App\Models\ReportDetail;
 use App\Models\Reporter;
 use App\Service\ReportQuery;
 use Illuminate\Http\Request;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class ReportController extends Controller
 {
@@ -61,6 +64,7 @@ class ReportController extends Controller
     public function store(StorereportRequest $request)
     {
         $validatedData = $request->validated();
+        $uploadedFileUrl = null;
 
         // Create a new category
         $category = Category::create(['name' => $validatedData['category']]);
@@ -71,15 +75,21 @@ class ReportController extends Controller
             'floor' => $validatedData['floor'],
             'room' => $validatedData['room']
         ]);
+        
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $uploadedFileUrl = Cloudinary::upload($file->getRealPath())->getSecurePath();
+        }
 
         // Create a new report detail
         $reportDetail = ReportDetail::create([
             'title' => $validatedData['title'],
             'description' => $validatedData['description'],
-            'image' => $validatedData['image'], // This is optional
             'anonymous' => $validatedData['anonymous'],
-            'feedback' => $validatedData['feedback'] // This is optional
+            'image' => $uploadedFileUrl ?? null
         ]);
+
+        
 
         $reporter_id = $validatedData['reporter_id'];
 

@@ -22,6 +22,7 @@ use App\Http\Resources\v1\ReporterResource;
 use App\Http\Resources\v1\ReportResource;
 use App\Models\Report;
 use Illuminate\Auth\Access\Gate;
+use Illuminate\Support\Facades\Log;
 
 class ReporterController extends Controller
 {
@@ -185,9 +186,12 @@ class ReporterController extends Controller
                 'message' => 'User Logged In Successfully',
                 'token' => $token,
                 'user_id' => $reporter->id ,
-                'name' => $reporter ->name
+                'name' => $reporter ->name,
+                'profile_pic' => $reporter ->profile_pic,
+                
                  // Include the user ID in the response
             ], 200);
+            Log::info('Profile picture', ['url' => $reporter->profile_pic]);
     
         } catch (\Throwable $th) {
             return response()->json([
