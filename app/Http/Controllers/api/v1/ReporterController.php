@@ -18,85 +18,99 @@ use App\Mail\ResetPassword;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\UpdateReportRequest;
 use App\Http\Resources\v1\ReporterCollection;
+use App\Http\Resources\v1\ReporterResource;
+use App\Http\Resources\v1\ReportResource;
 use App\Models\Report;
 use Illuminate\Auth\Access\Gate;
 
 class ReporterController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
-{
-    $filter = new ReportQuery();
-    $filterItems = $filter->transform($request);
 
-    $includeReport = $request->query('includeReport');
+        public function index(Request $request)
+    {
+        $filter = new ReportQuery();
+        $filterItems = $filter->transform($request);
 
-    $reportersQuery = Reporter::query();
+        $includeReport = $request->query('includeReport');
 
-    // Apply filters
-    foreach ($filterItems as $column => $value) {
-        // Check if the column exists in the reporters table
-        if (Schema::hasColumn('reporters', $column)) {
-            $reportersQuery->where($column, $value);
-        } else {
-            // Handle the case when the column doesn't exist
+        $reportersQuery = Reporter::query();
+
+        // Apply filters
+        foreach ($filterItems as $column => $value) {
+            // Check if the column exists in the reporters table
+            if (Schema::hasColumn('reporters', $column)) {
+                $reportersQuery->where($column, $value);
+            } else {
+                // Handle the case when the column doesn't exist
+            }
         }
+
+        // Include reports if needed
+        if ($includeReport) {
+            $reportersQuery->with(['reports' => function ($query) {
+                // You can further customize the report query if needed
+                $query->orderBy('created_at', 'desc'); // For example, ordering reports by created_at
+            }]);
+        }
+
+        // Paginate the results and append the query parameters
+        $perPage = $request->query('per_page', 10); // Default to 10 items per page
+        $reporters = $reportersQuery->paginate($perPage)->appends($request->query());
+
+        return new ReporterCollection($reporters); // Return a collection of reporters
     }
 
-    // Include reports if needed
-    if ($includeReport) {
-        $reportersQuery->with('reports');
-    } else {
-        // Eager load reports for all reporters
-        $reportersQuery->with('reports');
-    }
+            public function show($id)
+        {
+            // Find the reporter by ID
+            $reporter = Reporter::findOrFail($id);
 
-    // Paginate the results and append the query parameters
-    $perPage = $request->query('per_page', 10); // Default to 10 items per page
-    $reporters = $reportersQuery->paginate($perPage)->appends($request->query());
-
-    return new ReporterCollection($reporters); // Return a collection of reporters
-}
-
-public function allReportersWithStats()
-{
-    // if (Gate::denies('admin-ability')) {
-    //     throw new AuthorizationException('You are not authorized to perform this action.');
-    // }
-
-    $reporters = Reporter::withCount([
-        'reports as total_reports',
-        'reports as denied_reports' => function ($query) {
-            $query->where('status', 'deny');
-        },
-        'reports as accepted_reports' => function ($query) {
-            $query->where('status', 'complete');
+            // Return the reporter as a JSON response
+            return new ReporterResource($reporter);
         }
-    ])->get();
 
-    return response()->json($reporters);
-}
+
+        public function allReportersWithStats()
+    {
+        // if (Gate::denies('admin-ability')) {
+        //     throw new AuthorizationException('You are not authorized to perform this action.');
+        // }
+
+        $reporters = Reporter::withCount([
+            'reports as total_reports',
+            'reports as denied_reports' => function ($query) {
+                $query->where('status', 'deny');
+            },
+            'reports as accepted_reports' => function ($query) {
+                $query->where('status', 'complete');
+            }
+        ])->get();
+
+        return response()->json($reporters);
+    }
     /**
      * Store a newly created resource in storage.
      */
     public function store(StorereporterRequest $request)
     {
-        
         $validatedData = $request->validated();
     
-        // Generate a random password
-        $password = Str::random(12); // Generates a random 12-character password
+        $password = Str::random(12); 
     
-        // Create a new reporter
+        // Extract username from email address (assuming email format is 'username@example.com')
+        $emailParts = explode('@', $validatedData['email']);
+        $username = $emailParts[0]; // Use the part before '@' as the username
+    
+        // Create a new reporter with auto-generated name and default role
         $reporter = Reporter::create([
             'email' => $validatedData['email'],
+            'name' => $username, // Set the auto-generated name
             'password' => Hash::make($password),
+            'role' => 'user', // Set the default role
         ]);
     
         // Send email with the generated password
-        Mail::to($reporter->email)->send(new ResetPassword ($reporter, $password));
+        Mail::to($reporter->email)->send(new ResetPassword($reporter, $password));
     
         return response()->json(['message' => 'User created successfully'], 201);
     }
@@ -190,12 +204,13 @@ public function allReportersWithStats()
     {
         try {
             // Validate request data
-            $validateData = validator::make($request->all(), [
+            $validateData = Validator::make($request->all(), [
                 'email' => 'required|email',
+                'current_password' => 'required',
                 'password' => 'required',
                 'password_confirmation' => 'required|same:password',
             ]);
-
+    
             if ($validateData->fails()) {
                 return response()->json([
                     'status' => false,
@@ -203,21 +218,29 @@ public function allReportersWithStats()
                     'errors' => $validateData->errors()
                 ], 400);
             }
-
+    
             // Find the reporter by email
             $reporter = Reporter::where('email', $request->email)->first();
-
+    
             if (!$reporter) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Reporter not found'
                 ], 404);
             }
-
+    
+            // Compare the provided current password with the hashed password stored in the database
+            if (!Hash::check($request->current_password, $reporter->password)) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Current password is incorrect'
+                ], 400);
+            }
+    
             // Update the reporter's password
             $reporter->password = Hash::make($request->password);
             $reporter->save();
-
+    
             return response()->json([
                 'status' => true,
                 'message' => 'Password reset successfully'
@@ -229,6 +252,7 @@ public function allReportersWithStats()
             ], 500);
         }
     }
+    
 
     /**
      * Remove the specified resource from storage.

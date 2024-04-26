@@ -22,6 +22,7 @@ class ReporterResource extends JsonResource
             'email' => $this->email,
             'password' => $this->password,
             'name' => $this->username,
+            'reports' => ReportResource::collection($this->reports),
         ];
     }
 }

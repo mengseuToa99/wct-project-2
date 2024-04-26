@@ -19,5 +19,7 @@ class Reporter extends Authenticatable
     protected $fillable = [
         'email',
         'password',
+        'username',
+        'role',
     ];
 }
