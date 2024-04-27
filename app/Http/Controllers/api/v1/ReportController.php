@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -48,19 +49,19 @@ class ReportController extends Controller
         return new ReportCollection($reports);
     }
 
-
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function countCategories()
     {
-        //
+        $categoryCounts = DB::table('reports')
+            ->join('categories', 'reports.category_id', '=', 'categories.id')
+            ->select('categories.name as category', DB::raw('COUNT(reports.id) as count'))
+            ->groupBy('categories.name')
+            ->pluck('count', 'category')
+            ->toArray();
+    
+        return response()->json($categoryCounts);
     }
+    
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StorereportRequest $request)
     {
         $validatedData = $request->validated();

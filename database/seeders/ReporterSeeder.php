@@ -15,7 +15,7 @@ class ReporterSeeder extends Seeder
     {
         Reporter::factory()
             ->count(5)
-            ->hasReports(1) // each reporter has 1 report
+            ->hasReports(30) // each reporter has 1 report
             ->create();
         
     }

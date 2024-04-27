@@ -28,6 +28,8 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\api\v1'], f
     Route::get('/reporters/stats', [ReporterController::class, 'allReportersWithStats']);
     Route::delete('/reporter/{reporter}', [ReporterController::class, 'destroy']);
 
+    
+    Route::get('categories', [ReportController::class, 'countCategories']);
     Route::get('reports', [ReportController::class, 'index']);
     Route::post('reports', [ReportController::class, 'store']);
     Route::get('reports/{report}', [ReportController::class, 'show']);
