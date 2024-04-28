@@ -30,7 +30,7 @@ use Maatwebsite\Excel\Facades\Excel;
 class ReporterController extends Controller
 {
 
-        public function index(Request $request)
+    public function index(Request $request)
     {
         $filter = new ReportQuery();
         $filterItems = $filter->transform($request);
@@ -64,17 +64,17 @@ class ReporterController extends Controller
         return new ReporterCollection($reporters); // Return a collection of reporters
     }
 
-            public function show($id)
-        {
-            // Find the reporter by ID
-            $reporter = Reporter::findOrFail($id);
+    public function show($id)
+    {
+        // Find the reporter by ID
+        $reporter = Reporter::findOrFail($id);
 
-            // Return the reporter as a JSON response
-            return new ReporterResource($reporter);
-        }
+        // Return the reporter as a JSON response
+        return new ReporterResource($reporter);
+    }
 
 
-        public function allReportersWithStats()
+    public function allReportersWithStats()
     {
         // if (Gate::denies('admin-ability')) {
         //     throw new AuthorizationException('You are not authorized to perform this action.');
@@ -95,18 +95,46 @@ class ReporterController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-{
-    try {
-        $file = $request->file('reporters');
-        $import = new ReportersImport;
-        Excel::import($import, $file);
 
-        return response()->json(['message' => 'Reporters imported successfully', 'data' => $import->getRows()], 201);
-    } catch (Exception $e) {
-        return response()->json(['message' => 'Import failed', 'error' => $e->getMessage()], 400);
+    public function store(StorereporterRequest $request)
+    {
+        $validatedData = $request->validated();
+
+        $password = "password";
+
+        // Extract username from email address (assuming email format is 'username@example.com')
+        $emailParts = explode('@', $validatedData['email']);
+        $username = $emailParts[0]; // Use the part before '@' as the username
+
+        // Create a new reporter with auto-generated name and default role
+        $reporter = Reporter::create([
+            'email' => $validatedData['email'],
+            'username' => $username, // Set the auto-generated name
+            'password' => Hash::make($password),
+            'role' => $validatedData['role'], // Set the default role
+        ]);
+
+        // Send email with the generated password
+        Mail::to($reporter->email)->send(new ResetPassword($reporter, $password));
+
+        return response()->json([
+            'message' => 'User created successfully',
+            'reporter' => $reporter // Include the reporter object in the response
+        ], 201);
     }
-}
+
+    public function storeMulti(Request $request)
+    {
+        try {
+            $file = $request->file('reporters');
+            $import = new ReportersImport;
+            Excel::import($import, $file);
+
+            return response()->json(['message' => 'Reporters imported successfully', 'data' => $import->getRows()], 201);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Import failed', 'error' => $e->getMessage()], 400);
+        }
+    }
 
 
     public function reportStats()
@@ -114,7 +142,7 @@ class ReporterController extends Controller
         // if (Gate::denies('admin-ability')) {
         //     throw new AuthorizationException('You are not authorized to perform this action.');
         // }
-        
+
         // Count total reporters
         $totalUsers = Reporter::count();
 
@@ -147,7 +175,7 @@ class ReporterController extends Controller
                 'email' => 'required|email',
                 'password' => 'required'
             ]);
-    
+
             if ($validateUser->fails()) {
                 return response()->json([
                     'status' => false,
@@ -155,7 +183,7 @@ class ReporterController extends Controller
                     'errors' => $validateUser->errors()
                 ], 401);
             }
-    
+
             // Attempt to authenticate the reporter
             if (!Auth::guard('reporter')->attempt($request->only('email', 'password'))) {
                 return response()->json([
@@ -163,28 +191,27 @@ class ReporterController extends Controller
                     'message' => 'Email & Password do not match with our records.',
                 ], 401);
             }
-    
+
             // Get the authenticated reporter
             $reporter = Reporter::where('email', $request->email)->first();
-    
+
             if ($request->email === 'admin@example.com' && $request->password === 'pass1234') {
                 $token = $reporter->createToken('admin-token', ['admin-ability'])->plainTextToken;
             } else {
                 $token = $reporter->createToken('user-token')->plainTextToken;
             }
-    
+
             return response()->json([
                 'status' => true,
                 'message' => 'User Logged In Successfully',
                 'token' => $token,
-                'user_id' => $reporter->id ,
-                'name' => $reporter ->name,
-                'profile_pic' => $reporter ->profile_pic,
-                
-                 // Include the user ID in the response
+                'user_id' => $reporter->id,
+                'name' => $reporter->name,
+                'profile_pic' => $reporter->profile_pic,
+
+                // Include the user ID in the response
             ], 200);
             Log::info('Profile picture', ['url' => $reporter->profile_pic]);
-    
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
@@ -206,7 +233,7 @@ class ReporterController extends Controller
                 'password' => 'required',
                 'password_confirmation' => 'required|same:password',
             ]);
-    
+
             if ($validateData->fails()) {
                 return response()->json([
                     'status' => false,
@@ -214,17 +241,17 @@ class ReporterController extends Controller
                     'errors' => $validateData->errors()
                 ], 400);
             }
-    
+
             // Find the reporter by email
             $reporter = Reporter::where('email', $request->email)->first();
-    
+
             if (!$reporter) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Reporter not found'
                 ], 404);
             }
-    
+
             // Compare the provided current password with the hashed password stored in the database
             if (!Hash::check($request->current_password, $reporter->password)) {
                 return response()->json([
@@ -232,11 +259,11 @@ class ReporterController extends Controller
                     'message' => 'Current password is incorrect'
                 ], 400);
             }
-    
+
             // Update the reporter's password
             $reporter->password = Hash::make($request->password);
             $reporter->save();
-    
+
             return response()->json([
                 'status' => true,
                 'message' => 'Password reset successfully'
@@ -248,7 +275,7 @@ class ReporterController extends Controller
             ], 500);
         }
     }
-    
+
 
     /**
      * Remove the specified resource from storage.
