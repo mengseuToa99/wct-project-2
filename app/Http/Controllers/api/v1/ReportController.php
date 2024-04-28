@@ -90,8 +90,6 @@ class ReportController extends Controller
             'image' => $uploadedFileUrl ?? null
         ]);
 
-        
-
         $reporter_id = $validatedData['reporter_id'];
 
         // Check if the reporter exists
