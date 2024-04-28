@@ -157,7 +157,7 @@ class ReporterController extends Controller
         // Count reports that are denied
         $deniedReports = Report::where('status', 'deny')->count();
 
-        // Count reports that are accepted
+        $completeReports = Report::where('status', 'complete')->count();
         $acceptedReports = Report::where('status', 'pending')->count();
 
         $completedReports = Report::where('status', 'complete')->count();
@@ -170,6 +170,7 @@ class ReporterController extends Controller
         ->toArray();
 
         return response()->json([
+            'toatal_complete' => $completeReports,
             'total_users' => $totalUsers,
             'total_reports' => $totalReports,
             'denied_reports' => $deniedReports,
