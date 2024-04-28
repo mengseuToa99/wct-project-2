@@ -24,7 +24,9 @@ use App\Models\Report;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Support\Facades\Log;
 use App\Imports\ReportersImport;
+use App\Models\Category;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -158,11 +160,19 @@ class ReporterController extends Controller
         // Count reports that are accepted
         $acceptedReports = Report::where('status', 'pending')->count();
 
+        $categoryCounts = DB::table('reports')
+        ->join('categories', 'reports.category_id', '=', 'categories.id')
+        ->select('categories.name as category', DB::raw('COUNT(reports.id) as count'))
+        ->groupBy('categories.name')
+        ->pluck('count', 'category')
+        ->toArray();
+
         return response()->json([
             'total_users' => $totalUsers,
             'total_reports' => $totalReports,
             'denied_reports' => $deniedReports,
             'accepted_reports' => $acceptedReports,
+            'total category' => $categoryCounts,
         ]);
     }
 
