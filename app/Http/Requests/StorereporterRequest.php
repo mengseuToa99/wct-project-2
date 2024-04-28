@@ -17,10 +17,8 @@ class StorereporterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'username' => ['nullable'],
             'email' => ['required', 'email'],
-            'password' => ['nullable'],
-            'role' => ['nullable'],
+            'role' => ['required', 'string', 'in:admin,user'],
         ];
     }
 }

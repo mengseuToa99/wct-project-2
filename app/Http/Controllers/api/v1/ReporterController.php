@@ -96,7 +96,7 @@ class ReporterController extends Controller
     {
         $validatedData = $request->validated();
     
-        $password = Str::random(12); 
+        $password = "password"; 
     
         // Extract username from email address (assuming email format is 'username@example.com')
         $emailParts = explode('@', $validatedData['email']);
@@ -105,15 +105,18 @@ class ReporterController extends Controller
         // Create a new reporter with auto-generated name and default role
         $reporter = Reporter::create([
             'email' => $validatedData['email'],
-            'name' => $username, // Set the auto-generated name
+            'username' => $username, // Set the auto-generated name
             'password' => Hash::make($password),
-            'role' => 'user', // Set the default role
+            'role' => $validatedData['role'], // Set the default role
         ]);
     
         // Send email with the generated password
         Mail::to($reporter->email)->send(new ResetPassword($reporter, $password));
     
-        return response()->json(['message' => 'User created successfully'], 201);
+        return response()->json([
+            'message' => 'User created successfully',
+            'reporter' => $reporter // Include the reporter object in the response
+        ], 201);
     }
 
 
