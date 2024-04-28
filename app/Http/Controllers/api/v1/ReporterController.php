@@ -23,6 +23,9 @@ use App\Http\Resources\v1\ReportResource;
 use App\Models\Report;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Support\Facades\Log;
+use App\Imports\ReportersImport;
+use Exception;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReporterController extends Controller
 {
@@ -92,32 +95,18 @@ class ReporterController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorereporterRequest $request)
-    {
-        $validatedData = $request->validated();
-    
-        $password = "password"; 
-    
-        // Extract username from email address (assuming email format is 'username@example.com')
-        $emailParts = explode('@', $validatedData['email']);
-        $username = $emailParts[0]; // Use the part before '@' as the username
-    
-        // Create a new reporter with auto-generated name and default role
-        $reporter = Reporter::create([
-            'email' => $validatedData['email'],
-            'username' => $username, // Set the auto-generated name
-            'password' => Hash::make($password),
-            'role' => $validatedData['role'], // Set the default role
-        ]);
-    
-        // Send email with the generated password
-        Mail::to($reporter->email)->send(new ResetPassword($reporter, $password));
-    
-        return response()->json([
-            'message' => 'User created successfully',
-            'reporter' => $reporter // Include the reporter object in the response
-        ], 201);
+    public function store(Request $request)
+{
+    try {
+        $file = $request->file('reporters');
+        $import = new ReportersImport;
+        Excel::import($import, $file);
+
+        return response()->json(['message' => 'Reporters imported successfully', 'data' => $import->getRows()], 201);
+    } catch (Exception $e) {
+        return response()->json(['message' => 'Import failed', 'error' => $e->getMessage()], 400);
     }
+}
 
 
     public function reportStats()
