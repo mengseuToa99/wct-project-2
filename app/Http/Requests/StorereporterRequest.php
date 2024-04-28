@@ -18,7 +18,7 @@ class StorereporterRequest extends FormRequest
     {
         return [
             'email' => ['required', 'email'],
-            'role' => ['required', 'string', 'in:admin,user'],
+            // 'role' => ['required', 'string', 'in:admin,user'],
         ];
     }
 }
