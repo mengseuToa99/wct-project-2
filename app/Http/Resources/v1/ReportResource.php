@@ -29,6 +29,7 @@ class ReportResource extends JsonResource
         'building' => $this->Location->building,
         'floor' => $this->Location->floor,
         'room' => $this->Location->room,
+        'anonymous' => $this->ReportDetail->anonymous,
         'timeline' => Carbon::parse($this->created_at)->format('d M Y'),
     ];
     }
