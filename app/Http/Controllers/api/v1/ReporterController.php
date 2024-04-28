@@ -25,7 +25,10 @@ use Illuminate\Auth\Access\Gate;
 use Illuminate\Support\Facades\Log;
 use App\Imports\ReportersImport;
 use Exception;
+use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Facades\Excel;
+
+
 
 class ReporterController extends Controller
 {
