@@ -160,6 +160,8 @@ class ReporterController extends Controller
         // Count reports that are accepted
         $acceptedReports = Report::where('status', 'pending')->count();
 
+        $completedReports = Report::where('status', 'complete')->count();
+
         $categoryCounts = DB::table('reports')
         ->join('categories', 'reports.category_id', '=', 'categories.id')
         ->select('categories.name as category', DB::raw('COUNT(reports.id) as count'))
@@ -172,6 +174,7 @@ class ReporterController extends Controller
             'total_reports' => $totalReports,
             'denied_reports' => $deniedReports,
             'accepted_reports' => $acceptedReports,
+            'completed_reports' => $completedReports,
             'total category' => $categoryCounts,
         ]);
     }
