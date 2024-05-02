@@ -169,6 +169,13 @@ class ReporterController extends Controller
         ->pluck('count', 'category')
         ->toArray();
 
+        $categoryTypesCounts = DB::table('reports')
+        ->join('categories', 'reports.category_id', '=', 'categories.id')
+        ->select('categories.type as category', DB::raw('COUNT(reports.id) as count'))
+        ->groupBy('categories.type')
+        ->pluck('count', 'category')
+        ->toArray();
+
         return response()->json([
             'toatal_complete' => $completeReports,
             'total_users' => $totalUsers,
@@ -177,6 +184,7 @@ class ReporterController extends Controller
             'accepted_reports' => $acceptedReports,
             'completed_reports' => $completedReports,
             'total category' => $categoryCounts,
+            'total category type' => $categoryTypesCounts,
         ]);
     }
 
