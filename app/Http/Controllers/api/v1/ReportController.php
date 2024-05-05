@@ -57,10 +57,10 @@ class ReportController extends Controller
             ->groupBy('categories.name')
             ->pluck('count', 'category')
             ->toArray();
-    
+
         return response()->json($categoryCounts);
     }
-    
+
 
     public function store(StorereportRequest $request)
     {
@@ -68,7 +68,10 @@ class ReportController extends Controller
         $uploadedFileUrl = null;
 
         // Create a new category
-        $category = Category::create(['name' => $validatedData['category']]);
+        $category = Category::create([
+            'name' => $validatedData['category'],
+            'type' => $validatedData['type']
+        ]);
 
         // Create a new location
         $location = Location::create([
@@ -76,7 +79,7 @@ class ReportController extends Controller
             'floor' => $validatedData['floor'],
             'room' => $validatedData['room']
         ]);
-        
+
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $uploadedFileUrl = Cloudinary::upload($file->getRealPath())->getSecurePath();

@@ -22,6 +22,7 @@ class ReportResource extends JsonResource
         'Reporter_Pic' => $this->Reporter->profile_pic,
         'status' => $this->status,
         'category_name' => $this->category->name,
+        'category_type' => $this->category->type,
         'title' => $this->ReportDetail->title,
         'description' => $this->ReportDetail->description,
         'image' => $this->ReportDetail->image,
