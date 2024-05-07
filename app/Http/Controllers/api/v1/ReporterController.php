@@ -107,9 +107,8 @@ class ReporterController extends Controller
 
         $password = "password";
 
-        // Extract username from email address (assuming email format is 'username@example.com')
         $emailParts = explode('@', $validatedData['email']);
-        $username = $emailParts[0]; // Use the part before '@' as the username
+        $username = $emailParts[0];
 
         // Create a new reporter with auto-generated name and default role
         $reporter = Reporter::create([
