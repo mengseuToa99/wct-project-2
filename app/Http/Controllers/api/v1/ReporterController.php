@@ -315,14 +315,20 @@ class ReporterController extends Controller
         }
     }
 
-    public function logout(Request $request) 
-{
-    // Revoke all tokens for the authenticated reporter
-    $request->user('reporter')->tokens()->delete();
 
-    // Return success response
-    return response()->json(['message' => 'You have logged out successfully.'], 200);
-}
+    public function logout(Request $request) 
+    {
+        try {
+            // Revoke all tokens for the authenticated reporter
+            $request->user('reporter')->tokens()->delete();
+    
+            // Return success response
+            return response()->json(['message' => 'You have logged out successfully.'], 200);
+        } catch (\Exception $e) {
+            // Handle any exceptions that may occur during token revocation
+            return response()->json(['message' => 'Failed to log out.'], 500);
+        }
+    }
 
 
 

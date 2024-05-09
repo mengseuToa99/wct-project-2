@@ -20,7 +20,24 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\api\v1'], function() {
+Route::group(['prefix' => 'v1',
+'namespace' => 'App\Http\Controllers\api\v1',
+'middleware' => 'auth:sanctum',], function() {
+
+    Route::get('categories', [ReportController::class, 'countCategories']);
+    Route::get('reports', [ReportController::class, 'index']);
+    Route::post('reports', [ReportController::class, 'store']);
+    Route::get('reports/{report}', [ReportController::class, 'show']);
+
+    Route::post('/reporter/logout', [ReporterController::class, 'logout']);
+});
+
+
+Route::group([
+    'prefix' => 'v1',
+    'namespace' => 'App\Http\Controllers\api\v1',
+    'middleware' => ['auth:sanctum', App\Http\Middleware\AdminMiddleware::class],
+], function() {
 
     Route::apiResource('reporter', ReporterController::class);
     Route::get('/stats', [ReporterController::class, 'reportStats']);
@@ -29,15 +46,10 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\api\v1'], f
     Route::get('/reporters/stats', [ReporterController::class, 'allReportersWithStats']);
     Route::delete('/reporter/{reporter}', [ReporterController::class, 'destroy']);
 
-    Route::get('categories', [ReportController::class, 'countCategories']);
-    Route::get('reports', [ReportController::class, 'index']);
-    Route::post('reports', [ReportController::class, 'store']);
-    Route::get('reports/{report}', [ReportController::class, 'show']);
     Route::put('reports/{report}', [ReportController::class, 'update']);
     Route::patch('reports/{report}', [ReportController::class, 'update']);
     Route::delete('reports/{report}', [ReportController::class, 'destroy']);
 
-    Route::post('/reporter/logout', [ReporterController::class, 'logout']);
 });
 
 Route::post('v1/reporter/login', [ReporterController::class, 'login']);
