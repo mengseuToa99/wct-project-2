@@ -115,7 +115,7 @@ class ReporterController extends Controller
             'email' => $validatedData['email'],
             'username' => $username, // Set the auto-generated name
             'password' => Hash::make($password),
-            'role' => 'user'// Set the default role
+            'role' => $validatedData['role'],// Set the default role
         ]);
 
         // Send email with the generated password
