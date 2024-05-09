@@ -16,7 +16,6 @@ class ReportResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-
         'id' => $this->id,
         'Reporter_Name' => $this->Reporter->username,
         'Reporter_Pic' => $this->Reporter->profile_pic,

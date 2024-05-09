@@ -314,4 +314,17 @@ class ReporterController extends Controller
             return response()->json(['message' => 'Failed to delete reporter'], 500);
         }
     }
+
+    public function logout(Request $request) 
+{
+    // Revoke all tokens for the authenticated reporter
+    $request->user('reporter')->tokens()->delete();
+
+    // Return success response
+    return response()->json(['message' => 'You have logged out successfully.'], 200);
+}
+
+
+
+    
 }
