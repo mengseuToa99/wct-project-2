@@ -29,7 +29,8 @@ class UpdateReportRequest extends FormRequest
                 'reporter_id' => ['required', 'integer'],
                 'status' => ['required', Rule::in(['pending', 'complete', 'deny', 'nostatus'])],
                 'approved' => ['required', 'boolean'],
-                'tittle' => ['required'], 
+                'title' => ['required'], 
+                'feedback' =>['string'],
                 'building' => ['required'],
                 'floor' => ['required', 'integer'],
                 'anonymous' => ['required', 'boolean'],
@@ -41,7 +42,7 @@ class UpdateReportRequest extends FormRequest
             return [
 
                 'status' => ['sometimes', 'required', Rule::in(['pending', 'complete', 'deny', 'nostatus'])],
-                
+                'feedback' =>['string']
             ];
         }
     }

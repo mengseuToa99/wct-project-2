@@ -49,6 +49,17 @@ class ReportController extends Controller
         return new ReportCollection($reports);
     }
 
+    public function show($id)
+    {
+        $report = Report::find($id);
+
+        if (!$report) {
+            return response()->json(['message' => 'Report not found'], 404);
+        }
+
+        return response()->json($report, 200);
+    }
+
     public function countCategories()
     {
         $categoryCounts = DB::table('reports')
@@ -124,7 +135,12 @@ class ReportController extends Controller
     {
         $report->update($request->all());
 
-        return response()->json(['message' => 'Report updated successfully'], 200);
+        $report->ReportDetail->update(['feedback' => $request->feedback]);
+
+        return (new ReportResource($report))
+            ->response()
+            ->setStatusCode(200)
+            ->header('Content-Type', 'application/json');
     }
 
     /**

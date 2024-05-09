@@ -208,8 +208,10 @@ class ReporterController extends Controller
                 ], 401);
             }
 
+            $reporter = Reporter::where('email', $request->email)->first();
+
             // Attempt to authenticate the reporter
-            if (!Auth::guard('reporter')->attempt($request->only('email', 'password'))) {
+            if (!$reporter || !Hash::check($request->password, $reporter->password)) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Email & Password do not match with our records.',
@@ -317,18 +319,21 @@ class ReporterController extends Controller
 
 
     public function logout(Request $request) 
-    {
-        try {
-            // Revoke all tokens for the authenticated reporter
-            $request->user('reporter')->tokens()->delete();
+{
+    try {
+        // Log the request headers and the token
+
+        // Revoke all tokens for the authenticated reporter
+        $request->user('reporter')->tokens()->delete();
     
-            // Return success response
-            return response()->json(['message' => 'You have logged out successfully.'], 200);
-        } catch (\Exception $e) {
-            // Handle any exceptions that may occur during token revocation
-            return response()->json(['message' => 'Failed to log out.'], 500);
-        }
+        // Return success response
+        return response()->json(['message' => 'You have logged out successfully.'], 200);
+    } catch (\Exception $e) {
+
+        // Handle any exceptions that may occur during token revocation
+        return response()->json(['message' => 'Failed to log out.'], 500);
     }
+}
 
 
 
