@@ -233,6 +233,9 @@ class ReporterController extends Controller
                 'token' => $token,
                 'user_id' => $reporter->id,
                 'name' => $reporter->username,
+                'role' => $reporter->role,
+                'name' => $reporter->name,
+
                 'profile_pic' => $reporter->profile_pic,
 
                 // Include the user ID in the response
