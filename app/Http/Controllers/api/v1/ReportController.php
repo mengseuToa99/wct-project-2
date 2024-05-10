@@ -76,8 +76,30 @@ class ReportController extends Controller
     public function store(StorereportRequest $request)
     {
         $validatedData = $request->validated();
-        $uploadedFileUrl = null;
+    $uploadedFileUrl = null;
 
+    // Check if the report already exists
+    $existingReport = Report::where('reporter_id', $validatedData['reporter_id'])
+        ->where('status', $validatedData['status'])
+        ->whereHas('reportDetail', function($query) use ($validatedData) {
+            $query->where('title', $validatedData['title'])
+                ->where('description', $validatedData['description']);
+        })
+        ->whereHas('location', function($query) use ($validatedData) {
+            $query->where('building', $validatedData['building'])
+                ->where('floor', $validatedData['floor'])
+                ->where('room', $validatedData['room']);
+        })
+        ->whereHas('category', function($query) use ($validatedData) {
+            $query->where('name', $validatedData['category'])
+                ->where('type', $validatedData['type']);
+        })
+        ->exists();
+
+    if ($existingReport) {
+        // Report with the same details already exists. You can return an error message here.
+        return response()->json(['error' => 'Duplicate report found'], 422);
+    }
         // Create a new category
         $category = Category::create([
             'name' => $validatedData['category'],
