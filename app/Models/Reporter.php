@@ -11,15 +11,17 @@ use Laravel\Sanctum\HasApiTokens;
 class Reporter extends Authenticatable
 {
     use HasFactory, Notifiable, HasApiTokens;
-    
-    public function reports() {
+
+    public function reports()
+    {
         return $this->hasMany(Report::class);
     }
 
     protected $fillable = [
-        'email',
-        'password',
-        'username',
-        'role',
+        'username', 
+        'profile_pic', 
+        'email', 
+        'role', 
+        'password'
     ];
 }

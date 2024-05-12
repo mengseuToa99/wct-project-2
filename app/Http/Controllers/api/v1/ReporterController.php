@@ -115,7 +115,7 @@ class ReporterController extends Controller
             'email' => $validatedData['email'],
             'username' => $username, // Set the auto-generated name
             'password' => Hash::make($password),
-            'role' => $validatedData['role'],// Set the default role
+            'role' => $validatedData['role'], // Set the default role
         ]);
 
         // Send email with the generated password
@@ -162,18 +162,18 @@ class ReporterController extends Controller
         $completedReports = Report::where('status', 'complete')->count();
 
         $categoryCounts = DB::table('reports')
-        ->join('categories', 'reports.category_id', '=', 'categories.id')
-        ->select('categories.name as category', DB::raw('COUNT(reports.id) as count'))
-        ->groupBy('categories.name')
-        ->pluck('count', 'category')
-        ->toArray();
+            ->join('categories', 'reports.category_id', '=', 'categories.id')
+            ->select('categories.name as category', DB::raw('COUNT(reports.id) as count'))
+            ->groupBy('categories.name')
+            ->pluck('count', 'category')
+            ->toArray();
 
         $categoryTypesCounts = DB::table('reports')
-        ->join('categories', 'reports.category_id', '=', 'categories.id')
-        ->select('categories.type as category', DB::raw('COUNT(reports.id) as count'))
-        ->groupBy('categories.type')
-        ->pluck('count', 'category')
-        ->toArray();
+            ->join('categories', 'reports.category_id', '=', 'categories.id')
+            ->select('categories.type as category', DB::raw('COUNT(reports.id) as count'))
+            ->groupBy('categories.type')
+            ->pluck('count', 'category')
+            ->toArray();
 
         return response()->json([
             'toatal_complete' => $completeReports,
@@ -232,7 +232,7 @@ class ReporterController extends Controller
                 'message' => 'User Logged In Successfully',
                 'token' => $token,
                 'user_id' => $reporter->id,
-                'name' => $reporter->name,
+                'name' => $reporter->username,
                 'profile_pic' => $reporter->profile_pic,
 
                 // Include the user ID in the response
@@ -318,24 +318,20 @@ class ReporterController extends Controller
     }
 
 
-    public function logout(Request $request) 
-{
-    try {
-        // Log the request headers and the token
+    public function logout(Request $request)
+    {
+        try {
+            // Log the request headers and the token
 
-        // Revoke all tokens for the authenticated reporter
-        $request->user('reporter')->tokens()->delete();
-    
-        // Return success response
-        return response()->json(['message' => 'You have logged out successfully.'], 200);
-    } catch (\Exception $e) {
+            // Revoke all tokens for the authenticated reporter
+            $request->user('reporter')->tokens()->delete();
 
-        // Handle any exceptions that may occur during token revocation
-        return response()->json(['message' => 'Failed to log out.'], 500);
+            // Return success response
+            return response()->json(['message' => 'You have logged out successfully.'], 200);
+        } catch (\Exception $e) {
+
+            // Handle any exceptions that may occur during token revocation
+            return response()->json(['message' => 'Failed to log out.'], 500);
+        }
     }
-}
-
-
-
-    
 }
