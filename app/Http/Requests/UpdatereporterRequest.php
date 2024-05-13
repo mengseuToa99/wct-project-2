@@ -25,7 +25,7 @@ class UpdateReporterRequest extends FormRequest
                 'username' => 'sometimes|string', // Allow username to be nullable and only present sometimes
                 'profile_pic' => 'sometimes|file|mimes:png,jpg,jpeg',
                 'email' => 'nullable|email',
- // Allow profile_pic to be nullable and only present sometimes
+
             ];
         }
 

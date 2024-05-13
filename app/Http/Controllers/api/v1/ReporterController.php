@@ -36,15 +36,29 @@ use Maatwebsite\Excel\Facades\Excel;
 class ReporterController extends Controller
 {
 
-    public function update(UpdatereporterRequest $request, Reporter $report)
+        public function update(UpdateReporterRequest $request, Reporter $reporter)
     {
-        $report->update($request->all());
+        // Check if the reporter exists
+        if (!$reporter) {
+            return response()->json(['error' => 'Reporter not found'], 404);
+        }
 
-        return (new ReporterResource($report))
-            ->response()
-            ->setStatusCode(200)
-            ->header('Content-Type', 'application/json');
+        // Update the reporter's information
+        if ($request->has('username')) {
+            $reporter->username = $request->username;
+        }
+
+        if ($request->hasFile('profile_pic')) {
+            // Handle profile picture update
+            // Example: $request->file('profile_pic')->store('profile_pics');
+            $reporter->profile_pic = $request->file('profile_pic')->store('profile_pics');
+        }
+
+        $reporter->save();
+
+        return response()->json(['message' => 'Reporter updated successfully', 'data' => new ReporterResource($reporter)], 200);
     }
+
 
     public function index(Request $request)
     {
@@ -114,12 +128,12 @@ class ReporterController extends Controller
     public function store(StorereporterRequest $request)
     {
         $validatedData = $request->validated();
-
+    
         $password = "password";
-
+    
         $emailParts = explode('@', $validatedData['email']);
         $username = $emailParts[0];
-
+    
         // Create a new reporter with auto-generated name and default role
         $reporter = Reporter::create([
             'email' => $validatedData['email'], // Include the email field
@@ -127,16 +141,16 @@ class ReporterController extends Controller
             'password' => Hash::make($password),
             'role' => $validatedData['role'], // Set the default role
         ]);
-
+    
         // Send email with the generated password
         Mail::to($reporter->email)->send(new ResetPassword($reporter, $password));
-
+    
         return response()->json([
             'message' => 'User created successfully',
             'reporter' => $reporter // Include the reporter object in the response
         ], 201);
     }
-
+    
 
     public function storeMulti(Request $request)
     {
