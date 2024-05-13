@@ -20,8 +20,9 @@ class Reporter extends Authenticatable
     protected $fillable = [
         'username', 
         'profile_pic', 
-        'email', 
+        'email',
         'role', 
         'password'
     ];
+    
 }

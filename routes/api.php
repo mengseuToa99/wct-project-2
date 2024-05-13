@@ -29,6 +29,7 @@ Route::group(['prefix' => 'v1',
     Route::post('reports', [ReportController::class, 'store']);
     Route::get('reports/{report}', [ReportController::class, 'show']);
 
+    Route::patch('reporter/{report}', [ReporterController::class, 'update']);
     Route::post('/reporter/logout', [ReporterController::class, 'logout']);
 });
 

@@ -4,14 +4,14 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdatereporterRequest extends FormRequest
+class UpdateReporterRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -20,9 +20,13 @@ class UpdatereporterRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    {
-        return [
-            //
-        ];
-    }
+        {
+            return [
+                'username' => 'sometimes|string', // Allow username to be nullable and only present sometimes
+                'profile_pic' => 'sometimes|file|mimes:png,jpg,jpeg',
+                'email' => 'nullable|email',
+ // Allow profile_pic to be nullable and only present sometimes
+            ];
+        }
+
 }
