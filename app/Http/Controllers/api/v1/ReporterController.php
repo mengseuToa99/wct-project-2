@@ -36,28 +36,16 @@ use Maatwebsite\Excel\Facades\Excel;
 class ReporterController extends Controller
 {
 
-        public function update(UpdateReporterRequest $request, Reporter $reporter)
+    public function update(UpdatereporterRequest $request, Reporter $report)
     {
-        // Check if the reporter exists
-        if (!$reporter) {
-            return response()->json(['error' => 'Reporter not found'], 404);
-        }
-
-        // Update the reporter's information
-        if ($request->has('username')) {
-            $reporter->username = $request->username;
-        }
-
-        if ($request->hasFile('profile_pic')) {
-            // Handle profile picture update
-            // Example: $request->file('profile_pic')->store('profile_pics');
-            $reporter->profile_pic = $request->file('profile_pic')->store('profile_pics');
-        }
-
-        $reporter->save();
-
-        return response()->json(['message' => 'Reporter updated successfully', 'data' => new ReporterResource($reporter)], 200);
+        $report->update($request->all());
+    
+        return (new ReporterResource($report))
+            ->response()
+            ->setStatusCode(200)
+            ->header('Content-Type', 'application/json');
     }
+    
 
 
     public function index(Request $request)
@@ -257,10 +245,8 @@ class ReporterController extends Controller
                 'message' => 'User Logged In Successfully',
                 'token' => $token,
                 'user_id' => $reporter->id,
-                'name' => $reporter->username,
                 'role' => $reporter->role,
-                'name' => $reporter->name,
-
+                'name' => $reporter->username,
                 'profile_pic' => $reporter->profile_pic,
 
                 // Include the user ID in the response
