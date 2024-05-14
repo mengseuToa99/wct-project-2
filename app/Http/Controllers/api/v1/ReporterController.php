@@ -30,6 +30,7 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Facades\Excel;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 
 
@@ -38,7 +39,15 @@ class ReporterController extends Controller
 
     public function update(UpdatereporterRequest $request, Reporter $report)
     {
-        $report->update($request->all());
+        $data = $request->all();
+    
+        if($request->has('profile_pic')) {
+            $file = $request->file('profile_pic');
+            $uploadedFileUrl = Cloudinary::upload($file->getRealPath())->getSecurePath();
+            $data['profile_pic'] = $uploadedFileUrl;
+        }
+    
+        $report->update($data);
     
         return (new ReporterResource($report))
             ->response()
