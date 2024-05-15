@@ -26,6 +26,7 @@ use Illuminate\Auth\Access\Gate;
 use Illuminate\Support\Facades\Log;
 use App\Imports\ReportersImport;
 use App\Models\Category;
+use App\Traits\HttpRespones;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\ToModel;
@@ -36,6 +37,9 @@ use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class ReporterController extends Controller
 {
+
+    use HttpRespones;
+
 
     public function update(UpdatereporterRequest $request, Reporter $report)
     {
@@ -257,8 +261,6 @@ class ReporterController extends Controller
                 'role' => $reporter->role,
                 'name' => $reporter->username,
                 'profile_pic' => $reporter->profile_pic,
-
-                // Include the user ID in the response
             ], 200);
             Log::info('Profile picture', ['url' => $reporter->profile_pic]);
         } catch (\Throwable $th) {
@@ -327,24 +329,20 @@ class ReporterController extends Controller
 
 
     public function destroy(reporter $reporter)
-    {
-        try {
-            $reporter->delete();
+{
+    try {
+        $reporter->delete();
+        return $this->success('Reporter deleted successfully');
 
-            return response()->json(['message' => 'Reporter deleted successfully'], 200);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to delete reporter'], 500);
-        }
+    } catch (\Exception $e) {
+        return $this->error('Failed to delete reporter', 500);
     }
+}
 
 
     public function logout(Request $request)
     {
-        try {
-            $request->user('reporter')->tokens()->delete();
-            return response()->json(['message' => 'You have logged out successfully.'], 200);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to log out.'], 500);
-        }
+        $request->user('reporter')->tokens()->delete();
+        return $this->success('','You have log out successfully');
     }
 }
