@@ -15,12 +15,8 @@ use App\Models\Reporter;
 use App\Service\ReportQuery;
 use Illuminate\Http\Request;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
-
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
+use App\Traits\HttpRespones;
 
 class ReportController extends Controller
 {
@@ -172,6 +168,6 @@ class ReportController extends Controller
     {
         $report->delete();
 
-        return response()->json(null, 204);
+        return $this->success();
     }
 }

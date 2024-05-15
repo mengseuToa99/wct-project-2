@@ -309,7 +309,6 @@ class ReporterController extends Controller
                 ], 400);
             }
 
-            // Update the reporter's password
             $reporter->password = Hash::make($request->password);
             $reporter->save();
 
@@ -317,6 +316,7 @@ class ReporterController extends Controller
                 'status' => true,
                 'message' => 'Password reset successfully'
             ], 200);
+
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
@@ -326,9 +326,6 @@ class ReporterController extends Controller
     }
 
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(reporter $reporter)
     {
         try {
@@ -344,16 +341,9 @@ class ReporterController extends Controller
     public function logout(Request $request)
     {
         try {
-            // Log the request headers and the token
-
-            // Revoke all tokens for the authenticated reporter
             $request->user('reporter')->tokens()->delete();
-
-            // Return success response
             return response()->json(['message' => 'You have logged out successfully.'], 200);
         } catch (\Exception $e) {
-
-            // Handle any exceptions that may occur during token revocation
             return response()->json(['message' => 'Failed to log out.'], 500);
         }
     }
