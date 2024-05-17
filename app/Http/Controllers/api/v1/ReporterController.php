@@ -32,21 +32,21 @@ class ReporterController extends Controller
     public function update(UpdatereporterRequest $request, Reporter $reporter)
     {
         $data = $request->all();
-    
-        if($request->has('profile_pic')) {
+
+        if ($request->has('profile_pic')) {
             $file = $request->file('profile_pic');
             $uploadedFileUrl = Cloudinary::upload($file->getRealPath())->getSecurePath();
             $data['profile_pic'] = $uploadedFileUrl;
         }
-    
+
         $reporter->update($data);
-    
+
         return (new ReporterResource($reporter))
             ->response()
             ->setStatusCode(200)
             ->header('Content-Type', 'application/json');
     }
-    
+
 
     public function index(Request $request)
     {
@@ -56,7 +56,7 @@ class ReporterController extends Controller
         $reportersQuery = Reporter::query();
 
         foreach ($filterItems as $column => $value) {
-            
+
             if (Schema::hasColumn('reporters', $column)) {
                 $reportersQuery->where($column, $value);
             }
@@ -64,13 +64,13 @@ class ReporterController extends Controller
 
         if ($includeReport) {
             $reportersQuery->with(['reports' => function ($query) {
-                $query->orderBy('created_at', 'desc'); 
+                $query->orderBy('created_at', 'desc');
             }]);
         }
 
-        $perPage = $request->query('per_page', 10); 
+        $perPage = $request->query('per_page', 10);
         $reporters = $reportersQuery->paginate($perPage)->appends($request->query());
-        return new ReporterCollection($reporters); 
+        return new ReporterCollection($reporters);
     }
 
     public function show($id)
@@ -96,29 +96,29 @@ class ReporterController extends Controller
         return response()->json($reporters);
     }
 
-    
+
     public function store(StorereporterRequest $request)
     {
         $validatedData = $request->validated();
         $password = "password";
         $emailParts = explode('@', $validatedData['email']);
         $username = $emailParts[0];
-    
+
         $reporter = Reporter::create([
-            'email' => $validatedData['email'], 
-            'username' => $username, 
+            'email' => $validatedData['email'],
+            'username' => $username,
             'password' => Hash::make($password),
-            'role' => $validatedData['role'], 
+            'role' => $validatedData['role'],
         ]);
-    
+
         Mail::to($reporter->email)->send(new ResetPassword($reporter, $password));
-    
+
         return response()->json([
             'message' => 'User created successfully',
             'reporter' => $reporter
         ], 201);
     }
-    
+
 
     public function storeMulti(Request $request)
     {
@@ -127,7 +127,6 @@ class ReporterController extends Controller
             $import = new ReportersImport;
             Excel::import($import, $file);
             return response()->json(['message' => 'Reporters imported successfully', 'data' => $import->getRows()], 201);
-
         } catch (Exception $e) {
             return response()->json(['message' => 'Import failed', 'error' => $e->getMessage()], 400);
         }
@@ -144,16 +143,17 @@ class ReporterController extends Controller
         $completedReports = Report::where('status', 'complete')->count();
 
         $categoryCounts = DB::table('reports')
-            ->join('categories', 'reports.category_id', '=', 'categories.id')
-            ->select('categories.name as category', DB::raw('COUNT(reports.id) as count'))
-            ->groupBy('categories.name')
-            ->pluck('count', 'category')
-            ->toArray();
+        ->join('type_of_categories', 'reports.typeOfCategory_id', '=', 'type_of_categories.id')
+        ->join('categories', 'type_of_categories.category_id', '=', 'categories.id')
+        ->select('categories.name as category', DB::raw('COUNT(reports.id) as count'))
+        ->groupBy('categories.name')
+        ->pluck('count', 'category')
+        ->toArray();
 
         $categoryTypesCounts = DB::table('reports')
-            ->join('categories', 'reports.category_id', '=', 'categories.id')
-            ->select('categories.type as category', DB::raw('COUNT(reports.id) as count'))
-            ->groupBy('categories.type')
+            ->join('type_of_categories', 'reports.typeOfCategory_id', '=', 'type_of_categories.id')
+            ->select('type_of_categories.type as category', DB::raw('COUNT(reports.id) as count'))
+            ->groupBy('type_of_categories.type')
             ->pluck('count', 'category')
             ->toArray();
 
@@ -180,7 +180,7 @@ class ReporterController extends Controller
             ]);
 
             if ($validateUser->fails()) {
-                return  $this->error('', 'Validation error', 401); 
+                return  $this->error('', 'Validation error', 401);
             }
 
             $reporter = Reporter::where('email', $request->email)->first();
@@ -200,7 +200,6 @@ class ReporterController extends Controller
                 'profile_pic' => $reporter->profile_pic,
             ], 200);
             Log::info('Profile picture', ['url' => $reporter->profile_pic]);
-
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
@@ -208,7 +207,7 @@ class ReporterController extends Controller
             ], 500);
         }
     }
-    
+
 
     public function resetPassword(Request $request)
     {
@@ -254,7 +253,6 @@ class ReporterController extends Controller
                 'status' => true,
                 'message' => 'Password reset successfully'
             ], 200);
-
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
