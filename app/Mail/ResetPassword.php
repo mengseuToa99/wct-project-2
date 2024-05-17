@@ -17,9 +17,6 @@ class ResetPassword extends Mailable
     public $password;
     public $resetLink;
 
-    /**
-     * Create a new message instance.
-     */
     public function __construct(Reporter $reporter, $password)
     {
         $this->user = $reporter;
@@ -27,9 +24,6 @@ class ResetPassword extends Mailable
         $this->resetLink = 'http://yourdomain.com/reset-password?token='.$reporter->createToken('Reset Token')->plainTextToken;
     }
 
-    /**
-     * Build the message.
-     */
     public function build()
     {
         return $this->subject('Reset Password')

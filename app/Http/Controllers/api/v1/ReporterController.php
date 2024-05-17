@@ -6,30 +6,21 @@ namespace App\Http\Controllers\api\v1;
 use App\Models\Reporter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorereporterRequest;
-use App\Http\Requests\StorereportRequest;
 use App\Http\Requests\UpdatereporterRequest;
 use App\Service\ReportQuery;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ResetPassword;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Requests\UpdateReportRequest;
 use App\Http\Resources\v1\ReporterCollection;
 use App\Http\Resources\v1\ReporterResource;
-use App\Http\Resources\v1\ReportResource;
 use App\Models\Report;
-use Illuminate\Auth\Access\Gate;
 use Illuminate\Support\Facades\Log;
 use App\Imports\ReportersImport;
-use App\Models\Category;
-use App\Traits\HttpRespones;
 use Exception;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Facades\Excel;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
@@ -38,10 +29,7 @@ use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 class ReporterController extends Controller
 {
 
-    use HttpRespones;
-
-
-    public function update(UpdatereporterRequest $request, Reporter $report)
+    public function update(UpdatereporterRequest $request, Reporter $reporter)
     {
         $data = $request->all();
     
@@ -51,65 +39,49 @@ class ReporterController extends Controller
             $data['profile_pic'] = $uploadedFileUrl;
         }
     
-        $report->update($data);
+        $reporter->update($data);
     
-        return (new ReporterResource($report))
+        return (new ReporterResource($reporter))
             ->response()
             ->setStatusCode(200)
             ->header('Content-Type', 'application/json');
     }
     
 
-
     public function index(Request $request)
     {
         $filter = new ReportQuery();
         $filterItems = $filter->transform($request);
-
         $includeReport = $request->query('includeReport');
-
         $reportersQuery = Reporter::query();
 
-        // Apply filters
         foreach ($filterItems as $column => $value) {
-            // Check if the column exists in the reporters table
+            
             if (Schema::hasColumn('reporters', $column)) {
                 $reportersQuery->where($column, $value);
-            } else {
-                // Handle the case when the column doesn't exist
             }
         }
 
-        // Include reports if needed
         if ($includeReport) {
             $reportersQuery->with(['reports' => function ($query) {
-                // You can further customize the report query if needed
-                $query->orderBy('created_at', 'desc'); // For example, ordering reports by created_at
+                $query->orderBy('created_at', 'desc'); 
             }]);
         }
 
-        // Paginate the results and append the query parameters
-        $perPage = $request->query('per_page', 10); // Default to 10 items per page
+        $perPage = $request->query('per_page', 10); 
         $reporters = $reportersQuery->paginate($perPage)->appends($request->query());
-
-        return new ReporterCollection($reporters); // Return a collection of reporters
+        return new ReporterCollection($reporters); 
     }
 
     public function show($id)
     {
-        // Find the reporter by ID
         $reporter = Reporter::findOrFail($id);
-
-        // Return the reporter as a JSON response
         return new ReporterResource($reporter);
     }
 
 
     public function allReportersWithStats()
     {
-        // if (Gate::denies('admin-ability')) {
-        //     throw new AuthorizationException('You are not authorized to perform this action.');
-        // }
 
         $reporters = Reporter::withCount([
             'reports as total_reports',
@@ -123,32 +95,27 @@ class ReporterController extends Controller
 
         return response()->json($reporters);
     }
-    /**
-     * Store a newly created resource in storage.
-     */
+
+    
     public function store(StorereporterRequest $request)
     {
         $validatedData = $request->validated();
-    
         $password = "password";
-    
         $emailParts = explode('@', $validatedData['email']);
         $username = $emailParts[0];
     
-        // Create a new reporter with auto-generated name and default role
         $reporter = Reporter::create([
-            'email' => $validatedData['email'], // Include the email field
-            'username' => $username, // Set the auto-generated name
+            'email' => $validatedData['email'], 
+            'username' => $username, 
             'password' => Hash::make($password),
-            'role' => $validatedData['role'], // Set the default role
+            'role' => $validatedData['role'], 
         ]);
     
-        // Send email with the generated password
         Mail::to($reporter->email)->send(new ResetPassword($reporter, $password));
     
         return response()->json([
             'message' => 'User created successfully',
-            'reporter' => $reporter // Include the reporter object in the response
+            'reporter' => $reporter
         ], 201);
     }
     
@@ -159,8 +126,8 @@ class ReporterController extends Controller
             $file = $request->file('reporters');
             $import = new ReportersImport;
             Excel::import($import, $file);
-
             return response()->json(['message' => 'Reporters imported successfully', 'data' => $import->getRows()], 201);
+
         } catch (Exception $e) {
             return response()->json(['message' => 'Import failed', 'error' => $e->getMessage()], 400);
         }
@@ -169,22 +136,11 @@ class ReporterController extends Controller
 
     public function reportStats()
     {
-        // if (Gate::denies('admin-ability')) {
-        //     throw new AuthorizationException('You are not authorized to perform this action.');
-        // }
-
-        // Count total reporters
         $totalUsers = Reporter::count();
-
-        // Count total reports created by all reporters
         $totalReports = Report::count();
-
-        // Count reports that are denied
         $deniedReports = Report::where('status', 'deny')->count();
-
         $completeReports = Report::where('status', 'complete')->count();
         $acceptedReports = Report::where('status', 'pending')->count();
-
         $completedReports = Report::where('status', 'complete')->count();
 
         $categoryCounts = DB::table('reports')
@@ -214,9 +170,6 @@ class ReporterController extends Controller
     }
 
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function login(Request $request)
     {
         try {
@@ -227,53 +180,36 @@ class ReporterController extends Controller
             ]);
 
             if ($validateUser->fails()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Validation error',
-                    'errors' => $validateUser->errors()
-                ], 401);
+                return  $this->error('', 'Validation error', 401); 
             }
 
             $reporter = Reporter::where('email', $request->email)->first();
 
             // Attempt to authenticate the reporter
             if (!$reporter || !Hash::check($request->password, $reporter->password)) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Email & Password do not match with our records.',
-                ], 401);
-            }
-
-            // Get the authenticated reporter
-            $reporter = Reporter::where('email', $request->email)->first();
-
-            if ($request->email === 'admin@example.com' && $request->password === 'pass1234') {
-                $token = $reporter->createToken('admin-token', ['admin-ability'])->plainTextToken;
-            } else {
-                $token = $reporter->createToken('user-token')->plainTextToken;
+                return $this->error('', 'Credentials do not match', 401);
             }
 
             return response()->json([
                 'status' => true,
                 'message' => 'User Logged In Successfully',
-                'token' => $token,
+                'token' =>  $token = $reporter->createToken('Api token of ' . $reporter->name)->plainTextToken,
                 'user_id' => $reporter->id,
                 'role' => $reporter->role,
                 'name' => $reporter->username,
                 'profile_pic' => $reporter->profile_pic,
             ], 200);
             Log::info('Profile picture', ['url' => $reporter->profile_pic]);
+
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => $th->getMessage()
+                'message' => $this->getMessage()
             ], 500);
         }
     }
+    
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function resetPassword(Request $request)
     {
         try {
@@ -329,20 +265,31 @@ class ReporterController extends Controller
 
 
     public function destroy(reporter $reporter)
-{
-    try {
-        $reporter->delete();
-        return $this->success('Reporter deleted successfully');
+    {
+        try {
+            $reporter->delete();
 
-    } catch (\Exception $e) {
-        return $this->error('Failed to delete reporter', 500);
+            return response()->json(['message' => 'Reporter deleted successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to delete reporter'], 500);
+        }
     }
-}
 
 
     public function logout(Request $request)
     {
-        $request->user('reporter')->tokens()->delete();
-        return $this->success('','You have log out successfully');
+        try {
+            // Log the request headers and the token
+
+            // Revoke all tokens for the authenticated reporter
+            $request->user('reporter')->tokens()->delete();
+
+            // Return success response
+            return response()->json(['message' => 'You have logged out successfully.'], 200);
+        } catch (\Exception $e) {
+
+            // Handle any exceptions that may occur during token revocation
+            return response()->json(['message' => 'Failed to log out.'], 500);
+        }
     }
 }
