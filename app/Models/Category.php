@@ -11,7 +11,12 @@ class Category extends Model
 
     protected $fillable = [
         'name',
-        'type',
     ];
+
+    public function typeofcategory()
+    {
+        return $this->belongsTo(TypeOfCategory::class);
+    }
+
 }
 

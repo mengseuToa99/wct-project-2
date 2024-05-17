@@ -57,16 +57,18 @@ class ReportController extends Controller
     }
 
     public function countCategories()
-    {
-        $categoryCounts = DB::table('reports')
-            ->join('categories', 'reports.category_id', '=', 'categories.id')
-            ->select('categories.name as category', DB::raw('COUNT(reports.id) as count'))
-            ->groupBy('categories.name')
-            ->pluck('count', 'category')
-            ->toArray();
+{
+    $categoryCounts = DB::table('reports')
+        ->join('type_of_categories', 'reports.typeOfCategory_id', '=', 'type_of_categories.id')
+        ->join('categories', 'type_of_categories.category_id', '=', 'categories.id')
+        ->select('categories.name as category', DB::raw('COUNT(reports.id) as count'))
+        ->groupBy('categories.name')
+        ->pluck('count', 'category')
+        ->toArray();
 
-        return response()->json($categoryCounts);
-    }
+    return response()->json($categoryCounts);
+}
+
 
 
     public function store(StorereportRequest $request)
@@ -161,13 +163,4 @@ class ReportController extends Controller
             ->header('Content-Type', 'application/json');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(report $report)
-    {
-        $report->delete();
-
-        return $this->success();
-    }
 }

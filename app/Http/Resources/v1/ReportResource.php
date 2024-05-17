@@ -16,21 +16,21 @@ class ReportResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-        'id' => $this->id,
-        'Reporter_Name' => $this->Reporter->username,
-        'Reporter_Pic' => $this->Reporter->profile_pic,
-        'status' => $this->status,
-        'category_name' => $this->category->name,
-        'category_type' => $this->category->type,
-        'title' => $this->ReportDetail->title,
-        'description' => $this->ReportDetail->description,
-        'image' => $this->ReportDetail->image,
-        'feedback' => $this->ReportDetail->feedback,
-        'building' => $this->Location->building,
-        'floor' => $this->Location->floor,
-        'room' => $this->Location->room,
-        'anonymous' => $this->ReportDetail->anonymous,
-        'timeline' => Carbon::parse($this->created_at)->format('d M Y'),
-    ];
+            'id' => $this->id,
+            'Reporter_Name' => $this->reporter->username,
+            'Reporter_Pic' => $this->reporter->profile_pic,
+            'status' => $this->status,
+            'category_type' => $this->typeOfCategory->type,
+            'category_name' => $this->typeOfCategory->category->name,
+            'title' => $this->reportDetail->title,
+            'description' => $this->reportDetail->description,
+            'image' => $this->reportDetail->image,
+            'feedback' => $this->reportDetail->feedback,
+            'building' => $this->location->building,
+            'floor' => $this->location->floor,
+            'room' => $this->location->room,
+            'anonymous' => $this->reportDetail->anonymous,
+            'timeline' => Carbon::parse($this->created_at)->format('d M Y'),
+        ];
     }
 }

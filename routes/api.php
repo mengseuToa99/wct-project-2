@@ -4,7 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\v1\ReportController;
 use App\Http\Controllers\api\v1\ReporterController;
-
+use App\Http\Controllers\api\v1\TypeOfCategoryController;
+use Illuminate\Support\Facades\Validator;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -21,6 +22,13 @@ Route::group(['prefix' => 'v1',
 
     Route::patch('reporter/{report}', [ReporterController::class, 'update']);
     Route::post('/reporter/logout', [ReporterController::class, 'logout']);
+
+    Route::get('/types-with-categories', [TypeOfCategoryController::class, 'showTypesWithCategories']);
+    Route::post('/add-type', [TypeOfCategoryController::class, 'addType']);
+    Route::post('/types/{typeId}/add-category', [TypeOfCategoryController::class, 'addCategoryToType']);
+    Route::delete('/types/{typeId}', [TypeOfCategoryController::class, 'deleteTypeOfCategory']);
+    //not done above
+    Route::delete('/categories/{categoryId}', [TypeOfCategoryController::class, 'deleteCategory']);
 });
 
 

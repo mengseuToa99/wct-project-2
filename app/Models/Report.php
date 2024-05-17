@@ -34,8 +34,11 @@ class Report extends Model
         return $this->belongsTo(ReportDetail::class);
     }
 
-    public function typeofcategory()
+    public function typeOfCategory()
     {
-        return $this->belongsTo(typeofcategory::class);
+        return $this->belongsTo(TypeOfCategory::class, 'typeOfCategory_id');
     }
+
+    // Eager load relationships in queries
+    protected $with = ['reporter', 'location', 'reportDetail', 'typeOfCategory'];
 }
