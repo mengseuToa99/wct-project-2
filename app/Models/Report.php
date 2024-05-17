@@ -16,7 +16,7 @@ class Report extends Model
         'status',
         'location_id',
         'report_detail_id', 
-        'category_id',
+        'typeOfCategory_id',
     ];
 
     public function reporter()
@@ -34,8 +34,8 @@ class Report extends Model
         return $this->belongsTo(ReportDetail::class);
     }
 
-    public function category()
+    public function typeofcategory()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(typeofcategory::class);
     }
 }

@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Location;
 use App\Models\ReportDetail;
 use App\Models\Reporter;
+use App\Models\TypeOfCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -25,7 +26,7 @@ class ReportFactory extends Factory
             'status' => $this->faker->randomElement(['nostatus', 'pending', 'deny', 'complete']),
             'location_id' => Location::factory()->create()->id,
             'report_detail_id' => ReportDetail::factory()->create()->id,
-            'category_id' => Category::factory()->create()->id,
+            'typeOfCategory_id' => TypeOfCategory::factory()->create()->id,
         ];
     }
 }

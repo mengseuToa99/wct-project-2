@@ -20,8 +20,6 @@ class CategoryFactory extends Factory
             'name' => $this->faker->randomElement(['Door', 'Window', 'Chair', 'Building', 'Desk',
                     'Computer', 'Monitor', 'Projector', 'Printer', 'Network', 'Heating', 'Cooling',
                     'Plumbing', 'Electricity', 'Cleaning']),
-            'type' => $this->faker->randomElement(['infrastructure', 'technology', 'mantanence']),
-
         ];
     }
 }
