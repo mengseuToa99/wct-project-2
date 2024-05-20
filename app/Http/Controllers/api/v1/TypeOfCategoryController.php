@@ -23,18 +23,25 @@ class TypeOfCategoryController extends Controller
         // Iterate over the types and manually construct the response structure
         foreach ($types as $type) {
             $typeName = $type->type;
-            $categoryName = $type->category->name;
 
-            // Check if the type is already in the result array
+            // Initialize the type in the result array if it's not already there
             if (!isset($result[$typeName])) {
                 $result[$typeName] = [
+                    'id' => $type->id, // Add the type ID to the response for easier identification
                     'type' => $typeName,
                     'categories' => []
                 ];
             }
 
-            // Add the category to the type's categories array
-            $result[$typeName]['categories'][] = $categoryName;
+            // If the type has an associated category, add it to the type's categories array
+            if ($type->category) {
+                $categoryName = $type->category->name;
+                $categoryId = $type->category->id;
+                $result[$typeName]['categories'][] = [
+                    'id' => $categoryId,
+                    'name' => $categoryName
+                ];
+            }
         }
 
         // Re-index the result array to remove the type names as keys
@@ -50,25 +57,34 @@ class TypeOfCategoryController extends Controller
         // Validate the incoming request data
         $validator = Validator::make($request->all(), [
             'type' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id', // Assuming you're providing category_id
+            'category_name' => 'nullable|string|max:255', // Make category_name optional
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-    
+
         // Retrieve the validated input data
         $type = $request->input('type');
-        $categoryId = $request->input('category_id');
-    
+        $categoryName = $request->input('category_name');
+
+        // Initialize category_id as null
+        $categoryId = null;
+
+        // If a category name is provided, find or create the category
+        if ($categoryName) {
+            $category = Category::firstOrCreate(['name' => $categoryName]);
+            $categoryId = $category->id;
+        }
+
         // Create the new type
         $typeOfCategory = TypeOfCategory::create([
             'type' => $type,
-            'category_id' => $categoryId, // Assign the provided category_id
+            'category_id' => $categoryId, // Use the id of the found or created category, or null if no category name was provided
         ]);
-    
+
         return response()->json([
-            'message' => 'Type and categories added successfully',
+            'message' => 'Type added successfully',
             'type' => $typeOfCategory,
         ], 201);
     }
@@ -114,51 +130,39 @@ class TypeOfCategoryController extends Controller
     {
         // Find the type by ID
         $type = TypeOfCategory::find($typeId);
-    
+
         if (!$type) {
             return response()->json(['error' => 'Type not found'], 404);
         }
-    
-        // Find all categories associated with the type
-        $categories = $type->category()->get();
-    
-        // Loop through each category and delete associated reports
-        foreach ($categories as $category) {
-            // Get the reports associated with the category's type
-            $reports = $type->reports()->where('category_id', $category->id)->get();
-    
-            // Delete associated reports
-            foreach ($reports as $report) {
-                $report->delete();
+
+        // Find all types with the same name
+        $types = TypeOfCategory::where('type', $type->type)->get();
+
+        foreach ($types as $type) {
+            // Delete the category associated with the type
+            if ($type->category) {
+                $type->category->delete();
             }
+
+            // Delete the type
+            $type->delete();
         }
-    
-        // Delete the categories associated with the type
-        $type->category()->delete();
-    
-        // Delete the type
-        $type->delete();
-    
+
         return response()->json([
-            'message' => 'Type of category and associated categories deleted successfully',
+            'message' => 'Types of category and associated categories deleted successfully',
         ]);
     }
-    
+
     public function deleteCategory($categoryId)
     {
-        // Find the category by ID
         $category = Category::find($categoryId);
 
         if (!$category) {
-            return response()->json(['error' => 'Category not found'], 404);
+            return response()->json(['message' => 'Category not found'], 404);
         }
 
-        // Delete the category
         $category->delete();
 
-        return response()->json([
-            'message' => 'Category deleted successfully',
-        ]);
+        return response()->json(['message' => 'Category deleted successfully']);
     }
-    
-}    
+}
