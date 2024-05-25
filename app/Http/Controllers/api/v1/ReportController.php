@@ -60,7 +60,7 @@ class ReportController extends Controller
 
     
 
-    public function store(StorereportRequest $request)
+    public function makeReport(StorereportRequest $request)
     {
         $validatedData = $request->validated();
 

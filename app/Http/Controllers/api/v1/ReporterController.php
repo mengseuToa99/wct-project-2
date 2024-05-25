@@ -97,7 +97,7 @@ class ReporterController extends Controller
     }
 
 
-    public function store(StorereporterRequest $request)
+    public function addOneUser(StorereporterRequest $request)
     {
         $validatedData = $request->validated();
         $password = "password";
@@ -120,7 +120,7 @@ class ReporterController extends Controller
     }
 
 
-    public function storeMulti(Request $request)
+    public function addMultiUser(Request $request)
     {
         try {
             $file = $request->file('reporters');
@@ -262,7 +262,7 @@ class ReporterController extends Controller
     }
 
 
-    public function destroy(reporter $reporter)
+    public function deleteUser(reporter $reporter)
     {
         try {
             $reporter->delete();

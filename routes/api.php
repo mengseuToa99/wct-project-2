@@ -16,11 +16,11 @@ Route::group(['prefix' => 'v1',
 'middleware' => 'auth:sanctum',], function() {
 
     Route::get('reports', [ReportController::class, 'filterReports']);
-    Route::post('reports', [ReportController::class, 'store']);
-    Route::get('reports/{report}', [ReportController::class, 'show']);
-    Route::delete('reports/{report}', [ReportController::class, 'destroy']);
-    Route::patch('reporter/{report}', [ReporterController::class, 'update']);
+    Route::post('reports', [ReportController::class, 'makeReport']);
+    Route::get('reports/{report}', [ReportController::class, 'getReportById']);
+    Route::delete('reports/{report}', [ReportController::class, 'deleteReport']);
 
+    Route::patch('reporter/{report}', [ReporterController::class, 'update']);
     Route::post('/reporter/logout', [ReporterController::class, 'logout']);
 
     Route::get('/types-with-categories', [TypeOfCategoryController::class, 'showTypesWithCategories']);
@@ -39,14 +39,14 @@ Route::group([
 
     Route::apiResource('reporter', ReporterController::class);
     Route::get('/stats', [ReporterController::class, 'reportStats']);
-    Route::post('/reporter/addStu', [ReporterController::class, 'store']);
-    Route::post('/reporter/addMultiStu', [ReporterController::class, 'storeMulti']);
+    Route::post('/reporter/addStu', [ReporterController::class, 'addOneUser']);
+    Route::post('/reporter/addMultiStu', [ReporterController::class, 'addMultiUser']);
     Route::get('/reporters/stats', [ReporterController::class, 'allReportersWithStats']);
-    Route::delete('/reporter/{reporter}', [ReporterController::class, 'destroy']);
+    Route::delete('/reporter/{reporter}', [ReporterController::class, 'deleteUser']);
 
-    Route::put('reports/{report}', [ReportController::class, 'update']);
-    Route::patch('reports/{report}', [ReportController::class, 'update']);
-    Route::delete('reports/{report}', [ReportController::class, 'destroy']);
+    // Route::put('reports/{report}', [ReportController::class, 'update']);
+    Route::patch('reports/{report}', [ReportController::class, 'updateReportDetail']);
+    // Route::delete('reports/{report}', [ReportController::class, 'destroy']);
 
 });
 
