@@ -19,6 +19,7 @@ Route::group(['prefix' => 'v1',
     Route::get('reports', [ReportController::class, 'index']);
     Route::post('reports', [ReportController::class, 'store']);
     Route::get('reports/{report}', [ReportController::class, 'show']);
+    Route::delete('reports/{report}', [ReportController::class, 'destroy']);
 
     Route::patch('reporter/{report}', [ReporterController::class, 'update']);
     Route::post('/reporter/logout', [ReporterController::class, 'logout']);
@@ -27,7 +28,6 @@ Route::group(['prefix' => 'v1',
     Route::post('/add-type', [TypeOfCategoryController::class, 'addType']);
     Route::post('/types/{typeId}/add-category', [TypeOfCategoryController::class, 'addCategoryToType']);
     Route::delete('/types/{typeId}', [TypeOfCategoryController::class, 'deleteTypeOfCategory']);
-    //not done above
     Route::delete('/categories/{categoryId}', [TypeOfCategoryController::class, 'deleteCategory']);
 });
 
@@ -47,7 +47,6 @@ Route::group([
 
     Route::put('reports/{report}', [ReportController::class, 'update']);
     Route::patch('reports/{report}', [ReportController::class, 'update']);
-    Route::delete('reports/{report}', [ReportController::class, 'destroy']);
 
 });
 
