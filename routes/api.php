@@ -26,9 +26,7 @@ Route::group(['prefix' => 'v1',
 
     Route::get('/types-with-categories', [TypeOfCategoryController::class, 'showTypesWithCategories']);
     Route::post('/add-type', [TypeOfCategoryController::class, 'addType']);
-    Route::post('/types/{typeId}/add-category', [TypeOfCategoryController::class, 'addCategoryToType']);
     Route::delete('/types/{typeId}', [TypeOfCategoryController::class, 'deleteTypeOfCategory']);
-    Route::delete('/categories/{categoryId}', [TypeOfCategoryController::class, 'deleteCategory']);
 });
 
 
