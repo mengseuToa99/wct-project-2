@@ -17,9 +17,10 @@ Route::group(['prefix' => 'v1',
 
     Route::get('reports', [ReportController::class, 'filterReports']);
     Route::post('reports', [ReportController::class, 'store']);
-    Route::get('reports/{report}', [ReportController::class, 'getReportById']);
-
+    Route::get('reports/{report}', [ReportController::class, 'show']);
+    Route::delete('reports/{report}', [ReportController::class, 'destroy']);
     Route::patch('reporter/{report}', [ReporterController::class, 'update']);
+
     Route::post('/reporter/logout', [ReporterController::class, 'logout']);
 
     Route::get('/types-with-categories', [TypeOfCategoryController::class, 'showTypesWithCategories']);
