@@ -1,9 +1,8 @@
-<?php
+<?php 
 
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class UpdateReportRequest extends FormRequest
 {
@@ -22,28 +21,9 @@ class UpdateReportRequest extends FormRequest
      */
     public function rules(): array
     {
-        $method = $this->method();
-
-        if ($method == 'PUT') {
-            return [
-                'reporter_id' => ['required', 'integer'],
-                'status' => ['required', Rule::in(['pending', 'complete', 'deny', 'nostatus'])],
-                'approved' => ['required', 'boolean'],
-                'title' => ['required'], 
-                'feedback' =>['string'],
-                'building' => ['required'],
-                'floor' => ['required', 'integer'],
-                'anonymous' => ['required', 'boolean'],
-                'image' => ['required', 'url'],
-                'like' => ['required', 'integer'],
-                'deny' => ['required', 'boolean'],
-            ];
-        } else {
-            return [
-
-                'status' => ['sometimes', 'required', Rule::in(['pending', 'complete', 'deny', 'nostatus'])],
-                'feedback' =>['string']
-            ];
-        }
+        return [
+            'status' => ['sometimes', 'required', 'in:pending,complete,deny,nostatus'],
+            'feedback' => ['string']
+        ];
     }
 }

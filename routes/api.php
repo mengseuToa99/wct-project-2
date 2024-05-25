@@ -15,11 +15,9 @@ Route::group(['prefix' => 'v1',
 'namespace' => 'App\Http\Controllers\api\v1',
 'middleware' => 'auth:sanctum',], function() {
 
-    Route::get('categories', [ReportController::class, 'countCategories']);
-    Route::get('reports', [ReportController::class, 'index']);
+    Route::get('reports', [ReportController::class, 'filterReports']);
     Route::post('reports', [ReportController::class, 'store']);
     Route::get('reports/{report}', [ReportController::class, 'show']);
-    Route::delete('reports/{report}', [ReportController::class, 'destroy']);
 
     Route::patch('reporter/{report}', [ReporterController::class, 'update']);
     Route::post('/reporter/logout', [ReporterController::class, 'logout']);
@@ -27,6 +25,8 @@ Route::group(['prefix' => 'v1',
     Route::get('/types-with-categories', [TypeOfCategoryController::class, 'showTypesWithCategories']);
     Route::post('/add-type', [TypeOfCategoryController::class, 'addType']);
     Route::delete('/types/{typeId}', [TypeOfCategoryController::class, 'deleteTypeOfCategory']);
+    //not done above
+    Route::delete('/categories/{categoryId}', [TypeOfCategoryController::class, 'deleteCategory']);
 });
 
 
@@ -45,6 +45,7 @@ Route::group([
 
     Route::put('reports/{report}', [ReportController::class, 'update']);
     Route::patch('reports/{report}', [ReportController::class, 'update']);
+    Route::delete('reports/{report}', [ReportController::class, 'destroy']);
 
 });
 

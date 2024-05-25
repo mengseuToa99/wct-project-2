@@ -20,32 +20,34 @@ use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
+    
+
+    public function filterReports(Request $request)
     {
-        $status = $request->input('status');
-        $user_id = $request->input('reporter_id');
-
         $query = Report::query();
-
+    
         $validStatuses = ['pending', 'nostatus', 'complete', 'deny'];
-
-        if (in_array($status, $validStatuses)) {
+    
+        // Filter by status if provided and valid
+        $status = $request->input('status');
+        if ($status && in_array($status, $validStatuses)) {
             $query->where('status', $status);
         }
-
-        if ($user_id) {
-            $query->where('reporter_id', $user_id);
+    
+        // Filter by reporter ID if provided
+        $reporterId = $request->input('reporter_id');
+        if ($reporterId) {
+            $query->where('reporter_id', $reporterId);
         }
-
+    
+        // Paginate the filtered reports
         $reports = $query->paginate(5);
-
+    
         return new ReportCollection($reports);
     }
-
-    public function show($id)
+    
+    
+    public function getReportById($id)
     {
         $report = Report::find($id);
 
@@ -56,18 +58,7 @@ class ReportController extends Controller
         return response()->json($report, 200);
     }
 
-    public function countCategories()
-    {
-        $categoryCounts = DB::table('reports')
-            ->join('categories', 'reports.category_id', '=', 'categories.id')
-            ->select('categories.name as category', DB::raw('COUNT(reports.id) as count'))
-            ->groupBy('categories.name')
-            ->pluck('count', 'category')
-            ->toArray();
-
-        return response()->json($categoryCounts);
-    }
-
+    
 
     public function store(StorereportRequest $request)
     {
@@ -134,25 +125,20 @@ class ReportController extends Controller
         return new ReportResource($report);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateReportRequest $request, Report $report)
+
+    public function updateReportDetail(UpdateReportRequest $request, Report $report)
     {
-        $report->update($request->all());
-
-        $report->ReportDetail->update(['feedback' => $request->feedback]);
-
+        $report->update($request->except('feedback'));
+        $report->reportDetail()->update(['feedback' => $request->feedback]);
+    
         return (new ReportResource($report))
             ->response()
             ->setStatusCode(200)
             ->header('Content-Type', 'application/json');
-    }
+    }    
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(report $report)
+    
+    public function deleteReport(report $report)
     {
         $report->delete();
 
