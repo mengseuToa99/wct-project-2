@@ -17,7 +17,7 @@ Route::group(['prefix' => 'v1',
 
     Route::get('reports', [ReportController::class, 'filterReports']);
     Route::post('reports', [ReportController::class, 'store']);
-    Route::get('reports/{report}', [ReportController::class, 'show']);
+    Route::get('reports/{report}', [ReportController::class, 'getReportById']);
 
     Route::patch('reporter/{report}', [ReporterController::class, 'update']);
     Route::post('/reporter/logout', [ReporterController::class, 'logout']);
