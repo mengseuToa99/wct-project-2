@@ -17,7 +17,7 @@ class ReporterResource extends JsonResource
         return [
         
             'id' => $this->id,
-            'username' => $this->username,
+            'name' => $this->username,
             'role' => $this->role,
             'email' => $this->email,
             'profile_pic' => $this->profile_pic,
