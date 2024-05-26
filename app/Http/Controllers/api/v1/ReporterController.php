@@ -29,10 +29,11 @@ use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 class ReporterController extends Controller
 {
 
-    public function update(UpdatereporterRequest $request, Reporter $reporter)
+    public function update(UpdatereporterRequest $request, $id)
     {
+        $reporter = Reporter::findOrFail($id);
         $data = $request->all();
-
+        
         if ($request->has('profile_pic')) {
             $file = $request->file('profile_pic');
             $uploadedFileUrl = Cloudinary::upload($file->getRealPath())->getSecurePath();
@@ -41,10 +42,7 @@ class ReporterController extends Controller
 
         $reporter->update($data);
 
-        return (new ReporterResource($reporter))
-            ->response()
-            ->setStatusCode(200)
-            ->header('Content-Type', 'application/json');
+        return new ReporterResource($reporter);
     }
 
 
@@ -143,12 +141,12 @@ class ReporterController extends Controller
         $completedReports = Report::where('status', 'complete')->count();
 
         $categoryCounts = DB::table('reports')
-        ->join('type_of_categories', 'reports.typeOfCategory_id', '=', 'type_of_categories.id')
-        ->join('categories', 'type_of_categories.category_id', '=', 'categories.id')
-        ->select('categories.name as category', DB::raw('COUNT(reports.id) as count'))
-        ->groupBy('categories.name')
-        ->pluck('count', 'category')
-        ->toArray();
+            ->join('type_of_categories', 'reports.typeOfCategory_id', '=', 'type_of_categories.id')
+            ->join('categories', 'type_of_categories.category_id', '=', 'categories.id')
+            ->select('categories.name as category', DB::raw('COUNT(reports.id) as count'))
+            ->groupBy('categories.name')
+            ->pluck('count', 'category')
+            ->toArray();
 
         $categoryTypesCounts = DB::table('reports')
             ->join('type_of_categories', 'reports.typeOfCategory_id', '=', 'type_of_categories.id')
