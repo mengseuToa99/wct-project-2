@@ -51,7 +51,6 @@ class TypeOfCategoryController extends Controller
         return response()->json($result);
     }
 
-
     public function addType(Request $request)
     {
         // Validate the incoming request data
@@ -59,69 +58,42 @@ class TypeOfCategoryController extends Controller
             'type' => 'required|string|max:255',
             'category_name' => 'nullable|string|max:255', // Make category_name optional
         ]);
-
+    
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-
+    
         // Retrieve the validated input data
         $type = $request->input('type');
         $categoryName = $request->input('category_name');
-
+    
         // Initialize category_id as null
         $categoryId = null;
-
+    
         // If a category name is provided, find or create the category
         if ($categoryName) {
             $category = Category::firstOrCreate(['name' => $categoryName]);
             $categoryId = $category->id;
         }
-
-        // Create the new type
-        $typeOfCategory = TypeOfCategory::create([
-            'type' => $type,
-            'category_id' => $categoryId, // Use the id of the found or created category, or null if no category name was provided
-        ]);
-
+    
+        // Find the type if it exists
+        $typeOfCategory = TypeOfCategory::where('type', $type)->first();
+    
+        if ($typeOfCategory && $typeOfCategory->category_id === null) {
+            // If the type exists and its category_id is null, update it with the new category_id
+            $typeOfCategory->category_id = $categoryId;
+            $typeOfCategory->save();
+        } else {
+            // If the type doesn't exist or its category_id is not null, create a new type
+            $typeOfCategory = TypeOfCategory::create([
+                'type' => $type,
+                'category_id' => $categoryId, // Use the id of the found or created category, or null if no category name was provided
+            ]);
+        }
+    
         return response()->json([
             'message' => 'Type added successfully',
             'type' => $typeOfCategory,
-        ], 201);
-    }
-
-
-    public function addCategoryToType(Request $request, $typeId)
-    {
-        // Validate the incoming request data
-        $validator = Validator::make($request->all(), [
-            'category_name' => 'required|string|max:255',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        // Find the type by ID
-        $type = TypeOfCategory::find($typeId);
-
-        if (!$type) {
-            return response()->json(['error' => 'Type not found'], 404);
-        }
-
-        // Retrieve the validated input data
-        $categoryName = $request->input('category_name');
-
-        // Create or find the category
-        $category = Category::firstOrCreate(['name' => $categoryName]);
-
-        // Associate the category with the type
-        $type->category()->associate($category);
-        $type->save();
-
-        return response()->json([
-            'message' => 'Category added to type successfully',
-            'type' => $type,
-            'category' => $category,
         ], 201);
     }
 
