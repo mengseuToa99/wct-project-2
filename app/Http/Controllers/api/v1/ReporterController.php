@@ -130,7 +130,6 @@ class ReporterController extends Controller
         }
     }
 
-
     public function reportStats()
     {
         $totalUsers = Reporter::count();
@@ -167,7 +166,6 @@ class ReporterController extends Controller
         ]);
     }
 
-
     public function login(Request $request)
     {
         try {
@@ -191,13 +189,13 @@ class ReporterController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'User Logged In Successfully',
-                'token' =>  $token = $reporter->createToken('Api token of ' . $reporter->name)->plainTextToken,
+                'token' =>  $reporter->createToken('Api token of ' . $reporter->name)->plainTextToken,
                 'user_id' => $reporter->id,
                 'role' => $reporter->role,
                 'name' => $reporter->username,
                 'profile_pic' => $reporter->profile_pic,
             ], 200);
-            Log::info('Profile picture', ['url' => $reporter->profile_pic]);
+         
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
