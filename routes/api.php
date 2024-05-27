@@ -29,6 +29,10 @@ Route::group(['prefix' => 'v1',
     Route::delete('/types/{typeId}', [TypeOfCategoryController::class, 'deleteTypeOfCategory']);
     //not done above
     Route::delete('/categories/{categoryId}', [TypeOfCategoryController::class, 'deleteCategory']);
+
+    Route::get('/reporter/{reporter}', [ReporterController::class, 'show']);
+
+
 });
 
 

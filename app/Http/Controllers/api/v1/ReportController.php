@@ -47,15 +47,24 @@ class ReportController extends Controller
     }
 
 
-    public function getReportById($id)
+    public function getReportById($reporterId)
     {
-        $report = Report::find($id);
-
-        if (!$report) {
-            return response()->json(['message' => 'Report not found'], 404);
+        try {
+            // Query the database to find all reports by the reporter's ID
+            $reports = Report::where('reporter_id', $reporterId)->get();
+    
+            // Check if any reports were found
+            if ($reports->isEmpty()) {
+                return response()->json(['message' => 'No reports found for this reporter'], 404);
+            }
+    
+            // Return the reports
+            return response()->json($reports, 200);
+        } catch (\Exception $e) {
+            // Log any unexpected errors
+            \Log::error('Error retrieving reports', ['reporter_id' => $reporterId, 'error' => $e->getMessage()]);
+            return response()->json(['message' => 'An error occurred while retrieving the reports'], 500);
         }
-
-        return response()->json($report, 200);
     }
 
 
