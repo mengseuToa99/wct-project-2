@@ -17,6 +17,7 @@ Route::group(['prefix' => 'v1',
 
     Route::get('reports', [ReportController::class, 'filterReports']);
     Route::post('reports', [ReportController::class, 'makeReport']);
+    
     Route::get('reports/{report}', [ReportController::class, 'getReportById']);
     Route::delete('reports/{report}', [ReportController::class, 'deleteReport']);
 
