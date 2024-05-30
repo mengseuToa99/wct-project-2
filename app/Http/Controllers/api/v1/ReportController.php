@@ -17,40 +17,9 @@ use App\Service\ReportQuery;
 use Illuminate\Http\Request;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Support\Facades\DB;
-/**
- * @OA\Tag(
- *     name="Reports",
- *     description="API Endpoints for Reports"
- * )
- */
+
 class ReportController extends Controller
 {
- /**
-     * @OA\Get(
-     *     path="/api/v1/reports",
-     *     summary="Filter reports",
-     *     tags={"Reports"},
-     *     @OA\Parameter(
-     *         name="status",
-     *         in="query",
-     *         description="Filter by status",
-     *         required=false,
-     *         @OA\Schema(type="string")
-     *     ),
-     *     @OA\Parameter(
-     *         name="reporter_id",
-     *         in="query",
-     *         description="Filter by reporter ID",
-     *         required=false,
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(ref="#/components/schemas/ReportCollection")
-     *     )
-     * )
-     */
     public function filterReports(Request $request)
     {
         $query = Report::query();
@@ -75,33 +44,6 @@ class ReportController extends Controller
         return new ReportCollection($reports);
     }
 
- /**
-     * @OA\Get(
-     *     path="/api/v1/reports/{reporterId}",
-     *     summary="Get reports by reporter ID",
-     *     tags={"Reports"},
-     *     @OA\Parameter(
-     *         name="reporterId",
-     *         in="path",
-     *         description="Reporter ID",
-     *         required=true,
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Report"))
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="No reports found for this reporter"
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="An error occurred while retrieving the reports"
-     *     )
-     * )
-     */
     public function getReportById($reporterId)
     {
         try {
@@ -121,7 +63,6 @@ class ReportController extends Controller
             return response()->json(['message' => 'An error occurred while retrieving the reports'], 500);
         }
     }
-
 
     public function makeReport(StorereportRequest $request)
     {
@@ -200,7 +141,6 @@ class ReportController extends Controller
             ->setStatusCode(200)
             ->header('Content-Type', 'application/json');
     }
-
    
     public function deleteReport(report $report)
     {

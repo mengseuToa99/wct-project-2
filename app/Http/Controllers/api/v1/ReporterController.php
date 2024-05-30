@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\api\v1;
 
-
 use App\Models\Reporter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorereporterRequest;
@@ -17,14 +16,12 @@ use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\v1\ReporterCollection;
 use App\Http\Resources\v1\ReporterResource;
 use App\Models\Report;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use App\Imports\ReportersImport;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
-
-
 
 class ReporterController extends Controller
 {
@@ -44,7 +41,6 @@ class ReporterController extends Controller
 
         return new ReporterResource($reporter);
     }
-
 
     public function index(Request $request)
     {
@@ -98,7 +94,7 @@ class ReporterController extends Controller
     public function addOneUser(StorereporterRequest $request)
     {
         $validatedData = $request->validated();
-        $password = "password";
+        $password = Str::random(10);
         $emailParts = explode('@', $validatedData['email']);
         $username = $emailParts[0];
 
