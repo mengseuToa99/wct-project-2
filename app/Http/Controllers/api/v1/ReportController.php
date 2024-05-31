@@ -38,6 +38,8 @@ class ReportController extends Controller
             $query->where('reporter_id', $reporterId);
         }
 
+        $query->orderBy('created_at', 'desc');
+
         // Paginate the filtered reports
         $reports = $query->paginate(5);
 
