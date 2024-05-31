@@ -73,7 +73,6 @@ class ReporterController extends Controller
         return new ReporterResource($reporter);
     }
 
-
     public function allReportersWithStats()
     {
 
@@ -89,7 +88,6 @@ class ReporterController extends Controller
 
         return response()->json($reporters);
     }
-
 
     public function addOneUser(StorereporterRequest $request)
     {
@@ -112,7 +110,6 @@ class ReporterController extends Controller
             'reporter' => $reporter
         ], 201);
     }
-
 
     public function addMultiUser(Request $request)
     {
@@ -200,7 +197,6 @@ class ReporterController extends Controller
         }
     }
 
-
     public function resetPassword(Request $request)
     {
         try {
@@ -253,7 +249,6 @@ class ReporterController extends Controller
         }
     }
 
-
     public function deleteUser(reporter $reporter)
     {
         try {
@@ -264,7 +259,6 @@ class ReporterController extends Controller
             return response()->json(['message' => 'Failed to delete reporter'], 500);
         }
     }
-
 
     public function logout(Request $request)
     {
