@@ -192,7 +192,7 @@ class ReporterController extends Controller
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => $this->getMessage()
+                'message' => $th->getMessage()
             ], 500);
         }
     }
