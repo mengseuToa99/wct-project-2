@@ -32,7 +32,6 @@ Route::group(['prefix' => 'v1',
 
     Route::get('/reporter/{reporter}', [ReporterController::class, 'show']);
 
-
 });
 
 
