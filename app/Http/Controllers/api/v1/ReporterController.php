@@ -5,7 +5,7 @@ namespace App\Http\Controllers\api\v1;
 use App\Models\Reporter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorereporterRequest;
-use App\Http\Requests\UpdatereporterRequest;
+use App\Http\Requests\UpdateReporterRequest;
 use App\Service\ReportQuery;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
@@ -26,7 +26,7 @@ use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 class ReporterController extends Controller
 {
 
-    public function update(UpdatereporterRequest $request, $id)
+    public function update(UpdateReporterRequest $request, $id)
     {
         $reporter = Reporter::findOrFail($id);
         $data = $request->all();
